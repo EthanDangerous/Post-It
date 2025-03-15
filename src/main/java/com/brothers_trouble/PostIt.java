@@ -1,5 +1,6 @@
 package com.brothers_trouble;
 
+import com.brothers_trouble.registration.ItemRegistry;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -78,6 +79,7 @@ public class PostIt
         BLOCKS.register(modEventBus);
         // Register the Deferred Register to the mod event bus so items get registered
         ITEMS.register(modEventBus);
+        ItemRegistry.register(modEventBus);
         // Register the Deferred Register to the mod event bus so tabs get registered
         CREATIVE_MODE_TABS.register(modEventBus);
 
@@ -111,6 +113,7 @@ public class PostIt
     {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS)
             event.accept(EXAMPLE_BLOCK_ITEM);
+            event.accept(ItemRegistry.POST_IT_NOTE);
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
