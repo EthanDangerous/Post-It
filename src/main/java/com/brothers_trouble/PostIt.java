@@ -1,6 +1,8 @@
 package com.brothers_trouble;
 
 import com.brothers_trouble.registration.ItemRegistry;
+import com.brothers_trouble.registration.ModelRegistry;
+import com.brothers_trouble.registration.RenderRegistry;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -34,6 +36,9 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import static com.brothers_trouble.registration.EntityRegistry.ENTITY_TYPES;
+
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(PostIt.MODID)
@@ -79,7 +84,10 @@ public class PostIt
         BLOCKS.register(modEventBus);
         // Register the Deferred Register to the mod event bus so items get registered
         ITEMS.register(modEventBus);
+        ENTITY_TYPES.register(modEventBus);
+        RenderRegistry.register(modEventBus);
         ItemRegistry.register(modEventBus);
+        ModelRegistry.register(modEventBus);
         // Register the Deferred Register to the mod event bus so tabs get registered
         CREATIVE_MODE_TABS.register(modEventBus);
 
@@ -113,7 +121,9 @@ public class PostIt
     {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS)
             event.accept(EXAMPLE_BLOCK_ITEM);
-            event.accept(ItemRegistry.POST_IT_NOTE);
+
+        if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS)
+            event.accept(ItemRegistry.POST_IT_NOTE.get());
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call

@@ -1,5 +1,6 @@
 {
   "itemGroup.postit": "Example Mod Tab",
   "block.postit.example_block": "Example Block",
-  "item.postit.example_item": "Example Item"
+  "item.postit.example_item": "Example Item",
+  "item.postit.post_it_note": "Post It Note"
 }
