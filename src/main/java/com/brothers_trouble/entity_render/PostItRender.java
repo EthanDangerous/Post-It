@@ -14,20 +14,16 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 
 public class PostItRender extends EntityRenderer<PostItEntity> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/entity/post_it.png");
-
     public PostItRender(EntityRendererProvider.Context context) {
         super(context);
     }
 
-    @Override
     public ResourceLocation getTextureLocation(PostItEntity entity) {
-        return TEXTURE;
+        return ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/entity/post_it.png");
     }
 
     @Override
-    public void render(PostItEntity entity, float entityYaw, float partialTicks,
-                       PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    public void render(PostItEntity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
 
         // Position the model correctly
@@ -47,6 +43,5 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
 
         poseStack.popPose();
 
-        super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 }

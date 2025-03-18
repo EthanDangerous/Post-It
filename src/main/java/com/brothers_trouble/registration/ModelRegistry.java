@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 @EventBusSubscriber(modid = PostIt.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -25,13 +26,14 @@ public class ModelRegistry {
 
     @SubscribeEvent
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(EntityRegistry.POST_IT_NOTE_ENTITY.get(), PostItRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.POST_IT_NOTE_ENTITY.get(), PostItRender::new);
     }
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             // Any additional client setup can go here if needed
+//            ClientHooks.registerLayerDefinition(PostItRender.modelLocation, PostItRender.Model::createLayer);
         });
     }
 
