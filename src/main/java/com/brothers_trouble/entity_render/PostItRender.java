@@ -10,12 +10,16 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 
 public class PostItRender extends EntityRenderer<PostItEntity> {
+    private PostItModel model;
+
     public PostItRender(EntityRendererProvider.Context context) {
         super(context);
+        this.model = new PostItModel(context.bakeLayer(PostItModel.LAYER_LOCATION));
     }
 
     public ResourceLocation getTextureLocation(PostItEntity entity) {
@@ -34,12 +38,15 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         int rotation = entity.getEntityData().get(PostItEntity.DATA_ROTATION);
         poseStack.mulPose(Axis.YP.rotationDegrees(rotation * 90));
 
+        VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(
+                buffer, this.model.renderType(this.getTextureLocation(entity)),false, false);
+
+        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
+
+
         // Render the model
-//        PostItModel model = new PostItModel(modelPart); // Replace modelPart with appropriate parameter
-//
-//        // Render the model
-//        model.renderToBuffer(poseStack, vertexConsumer, packedLight,
-//                OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
+        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight,
+                OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
 
