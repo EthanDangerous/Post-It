@@ -16,12 +16,12 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 @EventBusSubscriber(modid = PostIt.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModelRegistry {
-    public static final ModelLayerLocation POST_IT_MODEL_LAYER =
-            new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "post_it_note"), "main");
+//    public static final ModelLayerLocation POST_IT_MODEL_LAYER =
+//            new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "post_it_note"), "main");
 
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(POST_IT_MODEL_LAYER, PostItModel::createBodyLayer);
+        event.registerLayerDefinition(PostItModel.LAYER_LOCATION, PostItModel::createBodyLayer);
     }
 
     @SubscribeEvent

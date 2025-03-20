@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_ROTATION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
-    private EntityDimensions dimensions = EntityDimensions.fixed(0.75F, 0.75F);
+    private EntityDimensions dimensions = EntityDimensions.fixed(0.25F, 0.25F);
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level) {
         super(entityType, level);

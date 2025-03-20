@@ -33,8 +33,8 @@ public class PostItModel extends EntityModel<PostItEntity> {
 		PartDefinition model = partdefinition.addOrReplaceChild("post_it",
 				CubeListBuilder.create()
 						.texOffs(0, 0)
-						.addBox(-1.0F, -1.0F, -1.0F, 2.0F, 1.0F, 2.0F, new CubeDeformation(0.0F)),
-				PartPose.offset(0.0F, 24.0F, 0.0F));
+						.addBox(0.0F, 0.0F, 0.0F, 4.0F, 0.0F, 4.0F, new CubeDeformation(0.0F)),
+				PartPose.offset(0.0F, 0.0F, 0.0F));
 
 		return LayerDefinition.create(meshdefinition, 16, 16);
 	}
