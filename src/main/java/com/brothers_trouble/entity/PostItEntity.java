@@ -39,6 +39,8 @@ public class PostItEntity extends Entity {
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level) {
         super(entityType, level);
+//        dimensions.makeBoundingBox(4, 0.1, 4);
+//        this.dimensions.makeBoundingBox(4, 0.1, 4);
         this.makeBoundingBox();
     }
 

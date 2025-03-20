@@ -40,10 +40,10 @@ public class PostItItem extends Item{
         //use the context to get the level data
         Level level = context.getLevel();
         Block clickedBlock = level.getBlockState(context.getClickedPos()).getBlock();
-        BlockPos blockpos = context.getClickedPos();
+//        BlockPos blockpos = context.getClickLocation();
 
         PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level);
-        Vec3 vec3 = Vec3.atBottomCenterOf(blockpos);
+        Vec3 vec3 = context.getClickLocation();
         postItEntity.setPos(vec3);
 
         level.addFreshEntity(postItEntity);
