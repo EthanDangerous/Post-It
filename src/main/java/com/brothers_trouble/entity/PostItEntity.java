@@ -1,5 +1,6 @@
 package com.brothers_trouble.entity;
 
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -12,6 +13,13 @@ import net.minecraft.world.level.Level;
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_ROTATION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
     private EntityDimensions dimensions = EntityDimensions.fixed(0.25F, 0.25F);
+
+    public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face) {
+        super(entityType, level);
+//        dimensions.makeBoundingBox(4, 0.1, 4);
+//        this.dimensions.makeBoundingBox(4, 0.1, 4);
+        this.makeBoundingBox();
+    }
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level) {
         super(entityType, level);

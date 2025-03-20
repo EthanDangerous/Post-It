@@ -2,6 +2,7 @@ package com.brothers_trouble.item;
 
 import com.brothers_trouble.entity.PostItEntity;
 import com.brothers_trouble.registration.EntityRegistry;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
@@ -30,8 +31,9 @@ public class PostItItem extends Item{
         Block clickedBlock = level.getBlockState(context.getClickedPos()).getBlock();
 //        BlockPos blockpos = context.getClickLocation();
 
-        PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level);
         Vec3 vec3 = context.getClickLocation();
+        Direction side = context.getClickedFace();
+        PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side);
         postItEntity.setPos(vec3);
 
         level.addFreshEntity(postItEntity);
