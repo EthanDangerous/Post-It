@@ -23,14 +23,18 @@ public class PostItModel extends EntityModel<PostItEntity> {
 	private final ModelPart model;
 
 	public PostItModel(ModelPart root) {
-		this.model = root.getChild("model");
+		this.model = root.getChild("post_it");
 	}
 
 	public static LayerDefinition createBodyLayer() {
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partdefinition = meshdefinition.getRoot();
 
-		PartDefinition bb_main = partdefinition.addOrReplaceChild("bb_main", CubeListBuilder.create().texOffs(0, 0).addBox(-1.0F, -1.0F, -1.0F, 2.0F, 1.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 24.0F, 0.0F));
+		PartDefinition model = partdefinition.addOrReplaceChild("post_it",
+				CubeListBuilder.create()
+						.texOffs(0, 0)
+						.addBox(-1.0F, -1.0F, -1.0F, 2.0F, 1.0F, 2.0F, new CubeDeformation(0.0F)),
+				PartPose.offset(0.0F, 24.0F, 0.0F));
 
 		return LayerDefinition.create(meshdefinition, 16, 16);
 	}
