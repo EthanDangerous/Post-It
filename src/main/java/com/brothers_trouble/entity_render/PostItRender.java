@@ -22,7 +22,7 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
     }
 
     public ResourceLocation getTextureLocation(PostItEntity entity) {
-        return ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/entity/post_it.png");
+        return ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/entity/post_it_note.png");
     }
 
     @Override
