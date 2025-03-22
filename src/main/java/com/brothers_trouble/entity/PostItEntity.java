@@ -5,33 +5,33 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Leashable;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.gameevent.GameEvent;
 
 public class PostItEntity extends Entity {
-    public static final EntityDataAccessor<Integer> DATA_ROTATION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
     private EntityDimensions dimensions = EntityDimensions.fixed(0.25F, 0.25F);
-    public Direction facing;
+//    public Direction facing;
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face) {
         super(entityType, level);
-        this.facing = face;
+//        this.facing = face;
+        if(face != null){
+            this.getEntityData().set(DATA_SIDE, face.get3DDataValue());
+        }
         System.out.println("entity facing is set to " + face);
         this.makeBoundingBox();
     }
 
-    public Direction getFacing() {
-        return this.facing;
+    public Direction getSide() {
+//        if (this.facing == null) {
+//            // Get the facing direction from the synchronized data
+//            int facingValue = this.getEntityData().get(DATA_ROTATION);
+//            this.facing = Direction.from3DDataValue(facingValue);
+//        }
+        return Direction.from3DDataValue(this.getEntityData().get(DATA_SIDE));
     }
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level) {
@@ -45,6 +45,14 @@ public class PostItEntity extends Entity {
     public boolean isPickable() {
         return true;
     }
+
+    public void setFacing(Direction direction) {
+//        this.facing = direction;
+        if (direction != null) {
+            this.getEntityData().set(DATA_SIDE, direction.get3DDataValue());
+        }
+    }
+
 
 //    public PostItEntity(Level level, BlockPos pos, Direction facingDirection) {
 //        super(EntityType.ITEM_FRAME, level);
@@ -83,17 +91,25 @@ public class PostItEntity extends Entity {
 //
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(DATA_ROTATION, 0);
+        builder.define(DATA_SIDE, 0);
     }
 
     @Override
     protected void readAdditionalSaveData(CompoundTag compoundTag) {
-
+//        if (compoundTag.contains("Facing")) {
+//            this.setFacing(Direction.from3DDataValue(compoundTag.getInt("Facing")));
+//        }
+        if (compoundTag.contains("Rotation")) {
+            this.getEntityData().set(DATA_SIDE, compoundTag.getInt("Rotation"));
+        }
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag compoundTag) {
-
+//        if (this.facing != null) {
+//            compoundTag.putInt("Facing", this.facing.get3DDataValue());
+//        }
+        compoundTag.putInt("Rotation", this.getEntityData().get(DATA_SIDE));
     }
 //
 //    @Override

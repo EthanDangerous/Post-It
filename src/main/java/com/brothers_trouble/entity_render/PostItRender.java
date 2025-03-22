@@ -17,6 +17,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class PostItRender extends EntityRenderer<PostItEntity> {
     private PostItModel model;
+    private Direction facing;
 
     public PostItRender(EntityRendererProvider.Context context) {
         super(context);
@@ -29,32 +30,40 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
 
     @Override
     public void render(PostItEntity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
-        Vec3 rotateAround = new Vec3(0.5, 0.5, 0.5);
+        Vec3 rotateAround = new Vec3(0, 0.5, 0);
         poseStack.pushPose();
-        System.out.println("render facing " + entity.getFacing());
-        Direction facing = entity.getFacing();
+
+//        System.out.println("render facing " + entity.getFacing());
 
         // Position the model correctly
         // These offsets depend on how you positioned your model in Blockbench
         poseStack.translate(0, 0, 0);
-        if(facing != null){
-            if (facing.equals(Direction.NORTH)) {
-                poseStack.rotateAround(Axis.YP.rotationDegrees(0), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
+//        entity.move();
+//        entity.moveRelative();
+        if(entity.getSide() != null){
+            if (entity.getSide().equals(Direction.NORTH)) {
+                poseStack.rotateAround(Axis.XN.rotationDegrees(90), (float)rotateAround.x, (float)(rotateAround.y-0.5), (float)rotateAround.z);
             }
-            if (facing.equals(Direction.SOUTH)) {
-                poseStack.rotateAround(Axis.YP.rotationDegrees(0), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
+            if (entity.getSide().equals(Direction.SOUTH)) {
+                poseStack.rotateAround(Axis.XP.rotationDegrees(90), (float)rotateAround.x, (float)(rotateAround.y-0.5), (float)rotateAround.z);
             }
-            if (facing.equals(Direction.EAST)) {
-                poseStack.rotateAround(Axis.YP.rotationDegrees(-90), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
+            if (entity.getSide().equals(Direction.EAST)) {
+                poseStack.rotateAround(Axis.ZN.rotationDegrees(90), (float)rotateAround.x, (float)(rotateAround.y-0.5), (float)rotateAround.z);
             }
-            if (facing.equals(Direction.WEST)) {
-                poseStack.rotateAround(Axis.YP.rotationDegrees(-90), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
+            if (entity.getSide().equals(Direction.WEST)) {
+                poseStack.rotateAround(Axis.ZP.rotationDegrees(90), (float)rotateAround.x, (float)(rotateAround.y-0.5), (float)rotateAround.z);
+            }
+            if (entity.getSide().equals(Direction.DOWN)) {
+//                poseStack.translate(0, 0, 0);
+
+                poseStack.rotateAround(Axis.ZP.rotationDegrees(180), (float)rotateAround.x, (float)(rotateAround.y-0.5), (float)rotateAround.z);
+                poseStack.rotateAround(Axis.YP.rotationDegrees(180), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
             }
         }
 
 
         // Apply entity rotation
-        int rotation = entity.getEntityData().get(PostItEntity.DATA_ROTATION);
+        int rotation = entity.getEntityData().get(PostItEntity.DATA_SIDE);
         poseStack.mulPose(Axis.YP.rotationDegrees(rotation * 90));
 
         VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(
