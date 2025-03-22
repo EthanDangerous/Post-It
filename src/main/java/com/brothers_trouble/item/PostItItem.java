@@ -24,21 +24,22 @@ public class PostItItem extends Item{
     @Override
     //create the method for when the item is being used on a block, taking in the context of UseOnContext
     public InteractionResult useOn(UseOnContext context) {
-        System.out.println("test");
-
-        //use the context to get the level data
         Level level = context.getLevel();
-        Block clickedBlock = level.getBlockState(context.getClickedPos()).getBlock();
+        if(context.getPlayer().isCrouching()){
+            Block clickedBlock = level.getBlockState(context.getClickedPos()).getBlock();
 //        BlockPos blockpos = context.getClickLocation();
 
-        Vec3 vec3 = context.getClickLocation();
-        Direction side = context.getClickedFace();
-        PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side);
-        postItEntity.setPos(vec3);
+            Vec3 vec3 = context.getClickLocation();
+            Direction side = context.getClickedFace();
+            PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side);
+            System.out.println(side);
+            postItEntity.setPos(vec3);
 
-        level.addFreshEntity(postItEntity);
+            level.addFreshEntity(postItEntity);
 
-        return InteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.FAIL;
     }
 
 //    public EntityType<?> getType(ItemStack stack) {

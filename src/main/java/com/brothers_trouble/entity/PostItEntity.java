@@ -9,16 +9,27 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Rotation;
 
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_ROTATION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
     private EntityDimensions dimensions = EntityDimensions.fixed(0.25F, 0.25F);
+    public Direction facing = Direction.NORTH;
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face) {
         super(entityType, level);
+        this.facing = face;
+        System.out.println("entity facing is set to " + face);
+//        if(face == Direction.NORTH){
+//            this.rotate(Rotation.CLOCKWISE_90);
+//        }
 //        dimensions.makeBoundingBox(4, 0.1, 4);
 //        this.dimensions.makeBoundingBox(4, 0.1, 4);
         this.makeBoundingBox();
+    }
+
+    public Direction getFacing() {
+        return this.facing;
     }
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level) {
