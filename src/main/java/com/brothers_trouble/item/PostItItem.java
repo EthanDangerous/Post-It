@@ -32,7 +32,7 @@ public class PostItItem extends Item{
             Vec3 vec3 = context.getClickLocation();
             Direction side = context.getClickedFace();
             PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side);
-            System.out.println(side);
+            System.out.println(level.isClientSide() + "<client side? : block face>" + side);
             postItEntity.setPos(vec3);
 
             level.addFreshEntity(postItEntity);
