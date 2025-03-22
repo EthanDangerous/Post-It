@@ -37,17 +37,19 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         // Position the model correctly
         // These offsets depend on how you positioned your model in Blockbench
         poseStack.translate(0, 0, 0);
-        if (facing.equals(Direction.NORTH)) {
-            poseStack.rotateAround(Axis.YP.rotationDegrees(0), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
-        }
-        if (facing.equals(Direction.SOUTH)) {
-            poseStack.rotateAround(Axis.YP.rotationDegrees(0), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
-        }
-        if (facing.equals(Direction.EAST)) {
-            poseStack.rotateAround(Axis.YP.rotationDegrees(-90), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
-        }
-        if (facing.equals(Direction.WEST)) {
-            poseStack.rotateAround(Axis.YP.rotationDegrees(-90), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
+        if(facing != null){
+            if (facing.equals(Direction.NORTH)) {
+                poseStack.rotateAround(Axis.YP.rotationDegrees(0), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
+            }
+            if (facing.equals(Direction.SOUTH)) {
+                poseStack.rotateAround(Axis.YP.rotationDegrees(0), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
+            }
+            if (facing.equals(Direction.EAST)) {
+                poseStack.rotateAround(Axis.YP.rotationDegrees(-90), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
+            }
+            if (facing.equals(Direction.WEST)) {
+                poseStack.rotateAround(Axis.YP.rotationDegrees(-90), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
+            }
         }
 
 
