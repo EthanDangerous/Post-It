@@ -9,6 +9,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
@@ -23,6 +25,10 @@ public class PostItEntity extends Entity {
         }
         System.out.println("entity facing is set to " + face);
         this.makeBoundingBox();
+    }
+
+    public AABB getAABB(){
+        return this.getBoundingBox();
     }
 
     public Direction getSide() {
