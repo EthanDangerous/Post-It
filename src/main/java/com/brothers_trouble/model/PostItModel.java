@@ -46,6 +46,6 @@ public class PostItModel extends EntityModel<PostItEntity> {
 
 	@Override
 	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int i1, int i2) {
-		model.render(poseStack, vertexConsumer, i, i1, i2);
+		model.render(poseStack, vertexConsumer, 255, i1, i2);
 	}
 }

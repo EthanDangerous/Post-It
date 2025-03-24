@@ -10,7 +10,7 @@ import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.Vec3;
 
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
@@ -25,6 +25,15 @@ public class PostItEntity extends Entity {
         }
         System.out.println("entity facing is set to " + face);
         this.makeBoundingBox();
+        this.dimensions.makeBoundingBox(1, 1, 1);
+    }
+//
+//    public AABB makeBoundingBox(int x, int y, int z){
+//        return this.dimensions.makeBoundingBox(new Vec3(x, y, z));
+//    }
+//
+    public void setRotation(){
+
     }
 
     public AABB getAABB(){
