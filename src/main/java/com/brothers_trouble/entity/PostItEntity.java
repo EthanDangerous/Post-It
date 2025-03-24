@@ -3,6 +3,7 @@ package com.brothers_trouble.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.Validate;
 
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
+//    public static final EntityDataAccessor<Direction> DATA_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
     private EntityDimensions dimensions = EntityDimensions.fixed(0.25F, 0.25F);
     protected Direction direction;
     private BlockPos pos;
@@ -29,8 +31,9 @@ public class PostItEntity extends Entity {
         }
         System.out.println("entity facing is set to " + face);
         this.setDirection(face);
-//        this.makeBoundingBox();
-//        this.setBoundingBox(calculateBoundingBox(pos, face));
+//        this.setBoundingBox(this.);
+        refreshDimensions();
+        System.out.println("EntityDataAccessor: " + this.getEntityData().get(DATA_SIDE));
     }
 
     protected void setDirection(Direction facingDirection) {
@@ -47,7 +50,6 @@ public class PostItEntity extends Entity {
         this.xRotO = this.getXRot();
         this.yRotO = this.getYRot();
         this.recalculateBoundingBox();
-        System.out.println(this.getBoundingBox());
     }
 
     protected final void recalculateBoundingBox() {
@@ -59,8 +61,6 @@ public class PostItEntity extends Entity {
         }
     }
 
-
-    //    @Override
     protected AABB calculateBoundingBox(BlockPos pos, Direction direction) {
         float f = 0.46875F;
         Vec3 vec3 = Vec3.atCenterOf(pos).relative(direction, -0.46875);
@@ -103,6 +103,7 @@ public class PostItEntity extends Entity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_SIDE, 0);
+//        builder.define(DATA_DIRECTION, Direction.UP);
     }
 
     @Override
@@ -113,6 +114,13 @@ public class PostItEntity extends Entity {
         if (compoundTag.contains("Rotation")) {
             this.getEntityData().set(DATA_SIDE, compoundTag.getInt("Rotation"));
         }
+//        if (compoundTag.contains("Facing")) {
+//            // Correctly read the direction using the DIRECTION serializer
+//            Direction savedDirection = compoundTag.get("Facing", Direction.class);
+//            if (savedDirection != null) {
+//                this.getEntityData().set(DATA_DIRECTION, savedDirection);
+//            }
+//        }
     }
 
     @Override
@@ -121,5 +129,6 @@ public class PostItEntity extends Entity {
 //            compoundTag.putInt("Facing", this.facing.get3DDataValue());
 //        }
         compoundTag.putInt("Rotation", this.getEntityData().get(DATA_SIDE));
+//        compoundTag.putInt("Facing", this.getEntityData().get(DATA_DIRECTION));
     }
 }

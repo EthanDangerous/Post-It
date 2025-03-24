@@ -38,11 +38,13 @@ public class PostItItem extends Item{
             postItEntity.setPos(vec3);
 
             level.addFreshEntity(postItEntity);
+            // send a packet to client
 
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;
     }
+
 
 //    public EntityType<?> getType(ItemStack stack) {
 //        CustomData customdata = (CustomData)stack.getOrDefault(DataComponents.ENTITY_DATA, CustomData.EMPTY);
