@@ -1,5 +1,6 @@
 package com.brothers_trouble.entity;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -11,21 +12,52 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.Validate;
 
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
     private EntityDimensions dimensions = EntityDimensions.fixed(0.25F, 0.25F);
-//    public Direction facing;
+//    public Direction direction;
 
-    public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face) {
+    public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, BlockPos pos) {
         super(entityType, level);
 //        this.facing = face;
         if(face != null){
             this.getEntityData().set(DATA_SIDE, face.get3DDataValue());
         }
         System.out.println("entity facing is set to " + face);
-        this.makeBoundingBox();
-        this.dimensions.makeBoundingBox(1, 1, 1);
+//        this.makeBoundingBox();
+        this.setBoundingBox(calculateBoundingBox(pos, face));
+//        this.makeBoundingBox();
+    }
+
+//    protected void setDirection(Direction facingDirection) {
+//        Validate.notNull(facingDirection);
+//        this.direction = facingDirection;
+//        if (facingDirection.getAxis().isHorizontal()) {
+//            this.setXRot(0.0F);
+//            this.setYRot((float)(this.direction.get2DDataValue() * 90));
+//        } else {
+//            this.setXRot((float)(-90 * facingDirection.getAxisDirection().getStep()));
+//            this.setYRot(0.0F);
+//        }
+//
+//        this.xRotO = this.getXRot();
+//        this.yRotO = this.getYRot();
+//        this.recalculateBoundingBox();
+//    }
+
+
+
+    //    @Override
+    protected AABB calculateBoundingBox(BlockPos pos, Direction direction) {
+        float f = 0.46875F;
+        Vec3 vec3 = Vec3.atCenterOf(pos).relative(direction, -0.46875);
+        Direction.Axis direction$axis = direction.getAxis();
+        double d0 = direction$axis == Direction.Axis.X ? 0.0625 : 0.75;
+        double d1 = direction$axis == Direction.Axis.Y ? 0.0625 : 0.75;
+        double d2 = direction$axis == Direction.Axis.Z ? 0.0625 : 0.75;
+        return AABB.ofSize(vec3, d0, d1, d2);
     }
 //
 //    public AABB makeBoundingBox(int x, int y, int z){
