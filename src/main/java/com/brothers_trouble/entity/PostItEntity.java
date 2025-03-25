@@ -28,15 +28,17 @@ public class PostItEntity extends Entity {
     protected Direction direction;
     private BlockPos pos;
     private PartPose entityPos = PartPose.ZERO;
+    private Level level;
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, BlockPos pos) {
         super(entityType, level);
         this.pos = pos;
+        this.level = level;
 //        this.facing = face;
         if(face != null){
             this.getEntityData().set(DATA_SIDE, face.get3DDataValue());
         }
-        System.out.println("entity facing is set to " + face);
+//        System.out.println("entity facing is set to " + face);
         this.setDirection(face);
 //        this.setBoundingBox(this.);
 //        refreshDimensions();
@@ -70,13 +72,15 @@ public class PostItEntity extends Entity {
             AABB aabb = this.calculateBoundingBox(this.pos, this.direction);
 //            Vec3 vec3 = aabb.getCenter();
 //            this.setPosRaw(vec3.x, vec3.y, vec3.z);
+            System.out.println("Is this the client side?\n" + level.isClientSide() + "\nAABB input before setting:\n -----------------------------------" + aabb);
             this.setBoundingBox(aabb);
+            System.out.println("Returned AABB:\n -----------------------------------" + this.getBoundingBox());
         }
     }
 
-    public void tick(){
-        recalculateBoundingBox();
-    }
+//    public void tick(){
+//        recalculateBoundingBox();
+//    }
 
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
@@ -93,9 +97,9 @@ public class PostItEntity extends Entity {
         Vec3 vec3 = new Vec3(entityPos.x, entityPos.y, entityPos.z);
 //        EntityPositionSource.getPosition(level);
         Direction.Axis direction$axis = direction.getAxis();
-        double d0 = direction$axis == Direction.Axis.X ? 0.125 : 0.1;
-        double d1 = direction$axis == Direction.Axis.Y ? 0.125 : 0.1;
-        double d2 = direction$axis == Direction.Axis.Z ? 0.125 : 0.1;
+        double d0 = direction$axis == Direction.Axis.X ? 0.25 : 0.2;
+        double d1 = direction$axis == Direction.Axis.Y ? 0.25 : 0.2;
+        double d2 = direction$axis == Direction.Axis.Z ? 0.25 : 0.2;
         return AABB.ofSize(vec3, d0, d1, d2);
     }
 
