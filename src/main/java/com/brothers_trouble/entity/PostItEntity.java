@@ -1,22 +1,18 @@
 package com.brothers_trouble.entity;
 
-import com.ibm.icu.text.MessagePattern;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.gameevent.EntityPositionSource;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.Validate;
@@ -34,13 +30,10 @@ public class PostItEntity extends Entity {
         super(entityType, level);
         this.pos = pos;
         this.level = level;
-//        this.facing = face;
         if(face != null){
             this.getEntityData().set(DATA_SIDE, face.get3DDataValue());
         }
-//        System.out.println("entity facing is set to " + face);
         this.setDirection(face);
-//        this.setBoundingBox(this.);
 //        refreshDimensions();
         System.out.println("EntityDataAccessor: " + this.getEntityData().get(DATA_SIDE));
 //        System.out.println(level.isClientSide() + "< client + " + this.getBoundingBox());
@@ -48,7 +41,7 @@ public class PostItEntity extends Entity {
 
     public InteractionResult interact(Player player, InteractionHand hand){
         System.out.println("Interaction");
-        return InteractionResult.PASS;
+        return InteractionResult.SUCCESS;
     }
 
     protected void setDirection(Direction facingDirection) {
