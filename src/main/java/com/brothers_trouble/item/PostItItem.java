@@ -2,6 +2,7 @@ package com.brothers_trouble.item;
 
 import com.brothers_trouble.entity.PostItEntity;
 import com.brothers_trouble.registration.EntityRegistry;
+import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
@@ -28,12 +29,9 @@ public class PostItItem extends Item{
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         if(context.getPlayer().isCrouching()){
-//            Block clickedBlock = level.getBlockState(context.getClickedPos()).getBlock();
             BlockPos blockpos = context.getClickedPos();
-
             Vec3 vec3 = context.getClickLocation();
             Direction side = context.getClickedFace();
-//            Direction direction = context.getHorizontalDirection();
             PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side, blockpos);
             System.out.println(level.isClientSide() + "<client side? : block face>" + side);
             postItEntity.setPos(vec3);

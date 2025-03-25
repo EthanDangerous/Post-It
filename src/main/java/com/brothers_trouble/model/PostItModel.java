@@ -37,6 +37,7 @@ public class PostItModel extends EntityModel<PostItEntity> {
 						.addBox(-2.0F, 0.1F, -2.0F, 4.0F, 0.0F, 4.0F, new CubeDeformation(0.001F)),
 				PartPose.offset(0.0F, 0.1F, 0.0F));
 
+
 		return LayerDefinition.create(meshdefinition, 16, 16);
 	}
 
