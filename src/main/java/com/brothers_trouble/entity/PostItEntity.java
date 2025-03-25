@@ -18,7 +18,7 @@ import org.apache.commons.lang3.Validate;
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
 //    public static final EntityDataAccessor<Direction> DATA_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
-    private EntityDimensions dimensions = EntityDimensions.fixed(0.25F, 0.25F);
+//    private EntityDimensions dimensions = EntityDimensions.fixed(0.25F, 0.25F);
     protected Direction direction;
     private BlockPos pos;
 
@@ -34,6 +34,7 @@ public class PostItEntity extends Entity {
 //        this.setBoundingBox(this.);
 //        refreshDimensions();
         System.out.println("EntityDataAccessor: " + this.getEntityData().get(DATA_SIDE));
+//        System.out.println(level.isClientSide() + "< client + " + this.getBoundingBox());
     }
 
     protected void setDirection(Direction facingDirection) {
@@ -55,23 +56,29 @@ public class PostItEntity extends Entity {
     protected final void recalculateBoundingBox() {
         if (this.direction != null) {
             AABB aabb = this.calculateBoundingBox(this.pos, this.direction);
-            Vec3 vec3 = aabb.getCenter();
-            this.setPosRaw(vec3.x, vec3.y, vec3.z);
+//            Vec3 vec3 = aabb.getCenter();
+//            this.setPosRaw(vec3.x, vec3.y, vec3.z);
             this.setBoundingBox(aabb);
         }
+    }
+
+    public void tick(){
+        recalculateBoundingBox();
     }
 
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         if (DATA_SIDE.equals(key)) {
+            System.out.println("before " + this.getBoundingBox());
             this.recalculateBoundingBox();
+            System.out.println("after " + this.getBoundingBox());
         }
         super.onSyncedDataUpdated(key);
     }
 
     protected AABB calculateBoundingBox(BlockPos pos, Direction direction) {
         float f = 0.46875F;
-        Vec3 vec3 = Vec3.atCenterOf(pos).relative(direction, -0.46875);
+        Vec3 vec3 = Vec3.atCenterOf(pos);
         Direction.Axis direction$axis = direction.getAxis();
         double d0 = direction$axis == Direction.Axis.X ? 0.0625 : 0.75;
         double d1 = direction$axis == Direction.Axis.Y ? 0.0625 : 0.75;
