@@ -1,4 +1,4 @@
-package com.brothers_trouble.entity_render;
+package com.brothers_trouble.entity.entity_render;
 
 import com.brothers_trouble.PostIt;
 import com.brothers_trouble.model.PostItModel;

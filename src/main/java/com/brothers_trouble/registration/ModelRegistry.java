@@ -2,7 +2,7 @@ package com.brothers_trouble.registration;
 
 import com.brothers_trouble.PostIt;
 import com.brothers_trouble.model.PostItModel;
-import com.brothers_trouble.entity_render.PostItRender;
+import com.brothers_trouble.entity.entity_render.PostItRender;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.api.distmarker.Dist;

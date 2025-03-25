@@ -1,6 +1,7 @@
 package com.brothers_trouble.item;
 
 import com.brothers_trouble.entity.PostItEntity;
+import com.brothers_trouble.menu.PostItMenu;
 import com.brothers_trouble.registration.EntityRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -30,6 +31,7 @@ public class PostItItem extends Item{
             Vec3 vec3 = context.getClickLocation();
             Direction side = context.getClickedFace();
             PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side, blockpos);
+//            PostItMenu postItMenu = new PostItMenu();
             System.out.println(level.isClientSide() + "<client side? : block face>" + side);
             postItEntity.setPos(vec3);
 
@@ -40,7 +42,6 @@ public class PostItItem extends Item{
         }
         return InteractionResult.FAIL;
     }
-
 
 //    public EntityType<?> getType(ItemStack stack) {
 //        CustomData customdata = (CustomData)stack.getOrDefault(DataComponents.ENTITY_DATA, CustomData.EMPTY);

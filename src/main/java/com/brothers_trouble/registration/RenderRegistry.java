@@ -1,7 +1,7 @@
 package com.brothers_trouble.registration;
 
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import com.brothers_trouble.entity_render.PostItRender;
+import com.brothers_trouble.entity.entity_render.PostItRender;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 

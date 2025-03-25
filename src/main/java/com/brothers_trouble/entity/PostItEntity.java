@@ -33,10 +33,10 @@ public class PostItEntity extends Entity {
         if(face != null){
             this.getEntityData().set(DATA_SIDE, face.get3DDataValue());
         }
-        this.setDirection(face);
+//        this.setDirection(face);
+        makeBoundingBox();
 //        refreshDimensions();
         System.out.println("EntityDataAccessor: " + this.getEntityData().get(DATA_SIDE));
-//        System.out.println(level.isClientSide() + "< client + " + this.getBoundingBox());
     }
 
     public InteractionResult interact(Player player, InteractionHand hand){
@@ -44,58 +44,77 @@ public class PostItEntity extends Entity {
         return InteractionResult.SUCCESS;
     }
 
-    protected void setDirection(Direction facingDirection) {
-        Validate.notNull(facingDirection);
-        this.direction = facingDirection;
-        if (facingDirection.getAxis().isHorizontal()) {
-            this.setXRot(0.0F);
-            this.setYRot((float)(this.direction.get2DDataValue() * 90));
-        } else {
-            this.setXRot((float)(-90 * facingDirection.getAxisDirection().getStep()));
-            this.setYRot(0.0F);
-        }
-
-        this.xRotO = this.getXRot();
-        this.yRotO = this.getYRot();
-        this.recalculateBoundingBox();
-    }
-
-    protected final void recalculateBoundingBox() {
-        if (this.direction != null) {
-            AABB aabb = this.calculateBoundingBox(this.pos, this.direction);
-//            Vec3 vec3 = aabb.getCenter();
-//            this.setPosRaw(vec3.x, vec3.y, vec3.z);
-            System.out.println("Is this the client side?\n" + level.isClientSide() + "\nAABB input before setting:\n -----------------------------------" + aabb);
-            this.setBoundingBox(aabb);
-            System.out.println("Returned AABB:\n -----------------------------------" + this.getBoundingBox());
-        }
-    }
+//    protected void setDirection(Direction facingDirection) {
+//        Validate.notNull(facingDirection);
+//        this.direction = facingDirection;
+//        if (facingDirection.getAxis().isHorizontal()) {
+//            this.setXRot(0.0F);
+//            this.setYRot((float)(this.direction.get2DDataValue() * 90));
+//        } else {
+//            this.setXRot((float)(-90 * facingDirection.getAxisDirection().getStep()));
+//            this.setYRot(0.0F);
+//        }
+//
+//        this.xRotO = this.getXRot();
+//        this.yRotO = this.getYRot();
+//        this.recalculateBoundingBox();
+//    }
+//
+//    protected final void recalculateBoundingBox() {
+//        if (this.direction != null) {
+//            AABB aabb = this.calculateBoundingBox(this.pos, this.direction);
+////            Vec3 vec3 = aabb.getCenter();
+////            this.setPosRaw(vec3.x, vec3.y, vec3.z);
+//            System.out.println("Is this the client side?\n" + level.isClientSide() + "\nAABB input before setting:\n -----------------------------------" + aabb);
+////            this.setBoundingBox(aabb);
+//            System.out.println("Returned AABB:\n -----------------------------------" + this.getBoundingBox());
+//        }
+//    }
 
 //    public void tick(){
 //        recalculateBoundingBox();
 //    }
 
+//    @Override
+//    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+//        if (DATA_SIDE.equals(key)) {
+//            System.out.println("before " + this.getBoundingBox());
+//            this.recalculateBoundingBox();
+//            System.out.println("after " + this.getBoundingBox());
+//        }
+//        super.onSyncedDataUpdated(key);
+//    }
+
+//    protected AABB calculateBoundingBox(BlockPos pos, Direction direction) {
+//        float f = 0.46875F;
+//        Vec3 vec3 = new Vec3(entityPos.x, entityPos.y, entityPos.z);
+////        EntityPositionSource.getPosition(level);
+//        Direction.Axis direction$axis = direction.getAxis();
+//        double d0 = direction$axis == Direction.Axis.X ? 0.25 : 0.2;
+//        double d1 = direction$axis == Direction.Axis.Y ? 0.25 : 0.2;
+//        double d2 = direction$axis == Direction.Axis.Z ? 0.25 : 0.2;
+//        return AABB.ofSize(vec3, d0, d1, d2);
+//    }
+
     @Override
-    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
-        if (DATA_SIDE.equals(key)) {
-            System.out.println("before " + this.getBoundingBox());
-            this.recalculateBoundingBox();
-            System.out.println("after " + this.getBoundingBox());
+    protected AABB makeBoundingBox() {
+        float thickness = 0.05f;
+        float length = 0.25f;
+        if(getSide() == Direction.UP){
+            return AABB.ofSize(position().add(0, 0.025, 0), length, thickness, length);
+        }else if(getSide() == Direction.DOWN){
+            return AABB.ofSize(position().subtract(0, 0.025, 0), length, thickness, length);
+        }else if(getSide() == Direction.NORTH){
+            return AABB.ofSize(position().subtract(0, 0, 0.025), length, length, thickness);
+        }else if(getSide() == Direction.EAST){
+            return AABB.ofSize(position().subtract(0, 0.0, 0), 0.25f, 0.1f, 0.25f);
+        }else if(getSide() == Direction.SOUTH){
+            return AABB.ofSize(position().add(0, 0, 0.025), length, length, thickness);
+        }else if(getSide() == Direction.WEST){
+            return AABB.ofSize(position().subtract(0, 0.0, 0), 0.25f, 0.1f, 0.25f);
         }
-        super.onSyncedDataUpdated(key);
+        return AABB.ofSize(position(), 1.0f, 1.0f, 1.0f);
     }
-
-    protected AABB calculateBoundingBox(BlockPos pos, Direction direction) {
-        float f = 0.46875F;
-        Vec3 vec3 = new Vec3(entityPos.x, entityPos.y, entityPos.z);
-//        EntityPositionSource.getPosition(level);
-        Direction.Axis direction$axis = direction.getAxis();
-        double d0 = direction$axis == Direction.Axis.X ? 0.25 : 0.2;
-        double d1 = direction$axis == Direction.Axis.Y ? 0.25 : 0.2;
-        double d2 = direction$axis == Direction.Axis.Z ? 0.25 : 0.2;
-        return AABB.ofSize(vec3, d0, d1, d2);
-    }
-
 
     public Direction getSide() {
 //        if (this.facing == null) {
@@ -118,12 +137,12 @@ public class PostItEntity extends Entity {
         return true;
     }
 
-    public void setFacing(Direction direction) {
-//        this.facing = direction;
-        if (direction != null) {
-            this.getEntityData().set(DATA_SIDE, direction.get3DDataValue());
-        }
-    }
+//    public void setFacing(Direction direction) {
+////        this.facing = direction;
+//        if (direction != null) {
+//            this.getEntityData().set(DATA_SIDE, direction.get3DDataValue());
+//        }
+//    }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
