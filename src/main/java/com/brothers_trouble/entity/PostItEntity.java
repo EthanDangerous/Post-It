@@ -32,7 +32,7 @@ public class PostItEntity extends Entity {
         System.out.println("entity facing is set to " + face);
         this.setDirection(face);
 //        this.setBoundingBox(this.);
-        refreshDimensions();
+//        refreshDimensions();
         System.out.println("EntityDataAccessor: " + this.getEntityData().get(DATA_SIDE));
     }
 
@@ -59,6 +59,14 @@ public class PostItEntity extends Entity {
             this.setPosRaw(vec3.x, vec3.y, vec3.z);
             this.setBoundingBox(aabb);
         }
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        if (DATA_SIDE.equals(key)) {
+            this.recalculateBoundingBox();
+        }
+        super.onSyncedDataUpdated(key);
     }
 
     protected AABB calculateBoundingBox(BlockPos pos, Direction direction) {
