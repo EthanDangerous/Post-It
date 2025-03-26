@@ -1,7 +1,5 @@
 package com.brothers_trouble.entity;
 
-import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -12,21 +10,16 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.NotNull;
 
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Direction> DATA_HORIZ = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
-//    private ItemStack item;
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, Direction facing) {
         super(entityType, level);
-//        this.item = item;
         if(face != null){
             this.getEntityData().set(DATA_SIDE, face.get3DDataValue());
         }
@@ -37,10 +30,9 @@ public class PostItEntity extends Entity {
         System.out.println("EntityDataAccessor: " + this.getEntityData().get(DATA_SIDE));
     }
 
-    public InteractionResult interact(Player player, InteractionHand hand){
+    public @NotNull InteractionResult interact(Player player, @NotNull InteractionHand hand){
         if(player.isShiftKeyDown()){
             System.out.println("Interaction 1");
-//            player.addItem(item);
             return InteractionResult.SUCCESS;
         }else{
             System.out.println("Interaction 2");
@@ -49,7 +41,7 @@ public class PostItEntity extends Entity {
     }
 
     @Override
-    protected AABB makeBoundingBox() {
+    protected @NotNull AABB makeBoundingBox() {
         float thickness = 0.05f;
         float length = 0.25f;
         float offset = thickness/2;
