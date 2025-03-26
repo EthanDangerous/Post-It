@@ -6,6 +6,7 @@ import com.brothers_trouble.registration.EntityRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -25,23 +26,27 @@ public class PostItItem extends Item{
     @Override
     //create the method for when the item is being used on a block, taking in the context of UseOnContext
     public InteractionResult useOn(UseOnContext context) {
+        Direction facing = vec3ToHorizontalDirection(context.getPlayer().getViewVector(1));
         Level level = context.getLevel();
         if(context.getPlayer().isCrouching()){
-            BlockPos blockpos = context.getClickedPos();
             Vec3 vec3 = context.getClickLocation();
             Direction side = context.getClickedFace();
-            PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side, blockpos);
+            PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side, facing);
 //            PostItMenu postItMenu = new PostItMenu();
             System.out.println(level.isClientSide() + "<client side? : block face>" + side);
             postItEntity.setPos(vec3);
 
             level.addFreshEntity(postItEntity);
-            // send a packet to client
 
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;
     }
+
+    public static Direction vec3ToHorizontalDirection(Vec3 vec) {
+        return Direction.fromYRot(Math.atan2(vec.z, vec.x) * (180F / (float)Math.PI));
+    }
+
 
 //    public EntityType<?> getType(ItemStack stack) {
 //        CustomData customdata = (CustomData)stack.getOrDefault(DataComponents.ENTITY_DATA, CustomData.EMPTY);
