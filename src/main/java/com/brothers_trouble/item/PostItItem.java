@@ -8,6 +8,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -28,7 +29,8 @@ public class PostItItem extends Item{
     public InteractionResult useOn(UseOnContext context) {
         Direction facing = vec3ToHorizontalDirection(context.getPlayer().getViewVector(1));
         Level level = context.getLevel();
-        if(context.getPlayer().isCrouching()){
+//        ItemStack itemstack = context.getItemInHand();
+        if(context.getPlayer().isShiftKeyDown()){
             Vec3 vec3 = context.getClickLocation();
             Direction side = context.getClickedFace();
             PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side, facing);
@@ -37,6 +39,7 @@ public class PostItItem extends Item{
             postItEntity.setPos(vec3);
 
             level.addFreshEntity(postItEntity);
+            context.getItemInHand().shrink(1);
 
             return InteractionResult.SUCCESS;
         }

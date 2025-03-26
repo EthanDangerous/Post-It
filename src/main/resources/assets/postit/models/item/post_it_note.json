@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "postit:item/post_it_note"
+    "layer0": "postit:item/post_it_note",
+    "layer1": "postit:item/post_it_note_text"
   }
 }
