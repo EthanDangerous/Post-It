@@ -17,6 +17,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import static com.brothers_trouble.entity.PostItEntity.DATA_HORIZ;
+
 public class PostItRender extends EntityRenderer<PostItEntity> {
     private final PostItModel model;
 
@@ -31,7 +33,6 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
 
     @Override
     public void render(PostItEntity entity, float entityYaw, float partialTicks, PoseStack poseStack, @NotNull MultiBufferSource buffer, int packedLight) {
-        final Direction horizFacing = entity.getHorizFacing();
         Vec3 rotateAround = new Vec3(0, 0.5, 0);
         Vec3 rotateTex = new Vec3(0, 0, 0);
         poseStack.pushPose();
@@ -62,6 +63,16 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
                 poseStack.rotateAround(Axis.ZP.rotationDegrees(90), (float)rotateAround.x, (float)(rotateAround.y-0.5), (float)rotateAround.z);
             }
             if (entity.getSide().equals(Direction.DOWN)) {
+                Direction direction = entity.getEntityData().get(DATA_HORIZ);
+                if(direction == Direction.NORTH){
+                    poseStack.rotateAround(Axis.YP.rotationDegrees(180), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
+                }else if(direction == Direction.EAST){
+                    poseStack.rotateAround(Axis.YP.rotationDegrees(90), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
+                }else if(direction == Direction.SOUTH){
+                    poseStack.rotateAround(Axis.YP.rotationDegrees(0), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
+                }else if(direction == Direction.WEST){
+                    poseStack.rotateAround(Axis.YN.rotationDegrees(90), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
+                }
                 poseStack.translate(0, 0, 0);
                 entity.setXRot(90);
                 entity.setYRot(90);
@@ -69,13 +80,14 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
                 poseStack.rotateAround(Axis.YP.rotationDegrees(180), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
             }
             if(entity.getSide().equals(Direction.UP)){
-                if(horizFacing == Direction.NORTH){
+                Direction direction = entity.getEntityData().get(DATA_HORIZ);
+                if(direction == Direction.NORTH){
                     poseStack.rotateAround(Axis.YP.rotationDegrees(0), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
-                }else if(horizFacing == Direction.EAST){
+                }else if(direction == Direction.EAST){
                     poseStack.rotateAround(Axis.YN.rotationDegrees(90), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
-                }else if(horizFacing == Direction.SOUTH){
+                }else if(direction == Direction.SOUTH){
                     poseStack.rotateAround(Axis.YP.rotationDegrees(180), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
-                }else if(horizFacing == Direction.WEST){
+                }else if(direction == Direction.WEST){
                     poseStack.rotateAround(Axis.YP.rotationDegrees(90), (float)rotateAround.x, (float)rotateAround.y, (float)rotateAround.z);
                 }
             }

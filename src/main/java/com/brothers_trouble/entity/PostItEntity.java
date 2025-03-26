@@ -19,14 +19,15 @@ import org.apache.commons.lang3.Validate;
 
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
-    public static Direction horizFacing;
+    public static final EntityDataAccessor<Direction> DATA_HORIZ = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, Direction facing) {
         super(entityType, level);
-        this.horizFacing = facing;
-        System.out.println(horizFacing);
         if(face != null){
             this.getEntityData().set(DATA_SIDE, face.get3DDataValue());
+        }
+        if(facing != null){
+            this.getEntityData().set(DATA_HORIZ, facing);
         }
         makeBoundingBox();
         System.out.println("EntityDataAccessor: " + this.getEntityData().get(DATA_SIDE));
@@ -35,10 +36,6 @@ public class PostItEntity extends Entity {
     public InteractionResult interact(Player player, InteractionHand hand){
         System.out.println("Interaction");
         return InteractionResult.SUCCESS;
-    }
-
-    public final Direction getHorizFacing(){
-        return horizFacing;
     }
 
     @Override
@@ -79,6 +76,7 @@ public class PostItEntity extends Entity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_SIDE, 0);
+        builder.define(DATA_HORIZ, Direction.NORTH);
     }
 
     @Override
