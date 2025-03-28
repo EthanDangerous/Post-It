@@ -2,6 +2,7 @@ package com.brothers_trouble;
 
 import com.brothers_trouble.registration.ItemRegistry;
 import com.brothers_trouble.registration.ModelRegistry;
+import com.brothers_trouble.registration.RecipeRegistry;
 import com.brothers_trouble.registration.RenderRegistry;
 import org.slf4j.Logger;
 
@@ -88,6 +89,7 @@ public class PostIt
         RenderRegistry.register(modEventBus);
         ItemRegistry.register(modEventBus);
         ModelRegistry.register(modEventBus);
+        RecipeRegistry.register(modEventBus);
         // Register the Deferred Register to the mod event bus so tabs get registered
         CREATIVE_MODE_TABS.register(modEventBus);
 
