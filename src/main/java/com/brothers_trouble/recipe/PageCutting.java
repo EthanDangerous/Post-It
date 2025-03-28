@@ -28,12 +28,12 @@ public class PageCutting extends CustomRecipe {
             if (!item.is(Items.AIR)) {
                 if(item.is(Items.PAPER)){
                     p++;
-                }
-                if(item.is(Items.SHEARS)){
+                }else if(item.is(Items.SHEARS)){
                     sh++;
-                }
-                if(item.is(Items.SLIME_BALL)){
+                }else if(item.is(Items.SLIME_BALL)){
                     sl++;
+                }else{
+                    return false;
                 }
             }
         }
@@ -62,7 +62,7 @@ public class PageCutting extends CustomRecipe {
 
     @Override
     public ItemStack assemble(CraftingInput craftingInput, HolderLookup.Provider provider) {
-        return new ItemStack(PostItItem);
+        return new ItemStack(ItemRegistry.POST_IT_NOTE);
     }
 
     @Override
