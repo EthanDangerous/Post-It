@@ -1,10 +1,12 @@
 package com.brothers_trouble.recipe;
 
-import com.brothers_trouble.item.PostItItem;
 import com.brothers_trouble.registration.ItemRegistry;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.item.Item;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
@@ -13,9 +15,12 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.item.Items;
 
+import static com.brothers_trouble.registration.RecipeRegistry.PAGE_CUTTING_SERIALIZER;
+
 public class PageCutting extends CustomRecipe {
-    public PageCutting(CraftingBookCategory category) {
-        super(category);
+
+    public PageCutting(){
+        super(CraftingBookCategory.MISC);
     }
 
     @Override
@@ -65,6 +70,15 @@ public class PageCutting extends CustomRecipe {
         return new ItemStack(ItemRegistry.POST_IT_NOTE);
     }
 
+    public ItemStack getResultItem(RegistryAccess access) {
+        return new ItemStack(ItemRegistry.POST_IT_NOTE);
+    }
+
+    @Override
+    public String getGroup() {
+        return "post_it";
+    }
+
     @Override
     public boolean canCraftInDimensions(int i, int i1) {
         return i == 2 && i1 == 2;
@@ -72,6 +86,18 @@ public class PageCutting extends CustomRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return null;
+        return PAGE_CUTTING_SERIALIZER.get();
+    }
+
+    public static class Serializer implements RecipeSerializer<PageCutting> {
+        @Override
+        public MapCodec<PageCutting> codec() {
+            return MapCodec.unit(PageCutting::new);
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, PageCutting> streamCodec() {
+            return StreamCodec.unit(new PageCutting());
+        }
     }
 }

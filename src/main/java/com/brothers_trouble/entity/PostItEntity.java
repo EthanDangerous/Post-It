@@ -1,7 +1,10 @@
 package com.brothers_trouble.entity;
 
+import com.brothers_trouble.menu.PostItMenu;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -10,6 +13,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
@@ -17,9 +22,11 @@ import org.jetbrains.annotations.NotNull;
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Direction> DATA_HORIZ = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
+    private ItemStack noteItem;
 
-    public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, Direction facing) {
+    public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, Direction facing, ItemStack item) {
         super(entityType, level);
+        this.noteItem = item;
         if(face != null){
             this.getEntityData().set(DATA_SIDE, face.get3DDataValue());
         }
@@ -33,11 +40,19 @@ public class PostItEntity extends Entity {
     public @NotNull InteractionResult interact(Player player, @NotNull InteractionHand hand){
         if(player.isShiftKeyDown()){
             System.out.println("Interaction 1");
+
+//            player.addItem(noteItem);
+            this.kill();
             return InteractionResult.SUCCESS;
         }else{
             System.out.println("Interaction 2");
+            openScreen();
             return InteractionResult.SUCCESS;
         }
+    }
+
+    public static void openScreen() {
+        Minecraft.getInstance().setScreen(new PostItMenu(Component.empty()));
     }
 
     @Override

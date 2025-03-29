@@ -5,6 +5,7 @@ import com.brothers_trouble.registration.EntityRegistry;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -23,11 +24,11 @@ public class PostItItem extends Item{
     public InteractionResult useOn(UseOnContext context) {
         Direction facing = vec3ToHorizontalDirection(context.getPlayer().getViewVector(1));
         Level level = context.getLevel();
-//        ItemStack itemstack = context.getItemInHand();
+        ItemStack itemstack = context.getItemInHand();
         if(context.getPlayer().isShiftKeyDown()){
             Vec3 vec3 = context.getClickLocation();
             Direction side = context.getClickedFace();
-            PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side, facing);
+            PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side, facing, itemstack);
 //            PostItMenu postItMenu = new PostItMenu();
             System.out.println(level.isClientSide() + "<client side? : block face>" + side);
             postItEntity.setPos(vec3);

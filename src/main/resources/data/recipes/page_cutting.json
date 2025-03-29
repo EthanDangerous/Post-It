@@ -1,0 +1,14 @@
+{
+  "type": "postit:page_cutting",
+  "ingredients": [
+    {
+      "item": "minecraft:paper" },
+    {
+      "item": "minecraft:shears" },
+    {
+      "item": "minecraft:slime_ball" }
+  ],
+  "result": {
+    "item": "postit:post_it_note"
+  }
+}
