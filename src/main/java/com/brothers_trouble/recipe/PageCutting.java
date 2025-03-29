@@ -8,14 +8,12 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.item.Items;
 
 import static com.brothers_trouble.registration.RecipeRegistry.PAGE_CUTTING_SERIALIZER;
+import static com.brothers_trouble.registration.RecipeRegistry.PAGE_CUTTING_TYPE;
 
 public class PageCutting extends CustomRecipe {
 
@@ -76,7 +74,12 @@ public class PageCutting extends CustomRecipe {
 
     @Override
     public String getGroup() {
-        return "post_it";
+        return "page_cutting";
+    }
+
+    @Override
+    public RecipeType<?> getType() {
+        return PAGE_CUTTING_TYPE.get();
     }
 
     @Override
