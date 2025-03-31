@@ -22,12 +22,14 @@ public class PostItMenu extends Screen {
 
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        int i = (this.width - 252) / 2;
-        int j = (this.height - 140) / 2;
+        int texWidth = 160;
+        int texHeight = 160;
+        int i = (this.width - 80) / 2;
+        int j = (this.height - 80) / 2;
 //        Component page = Component.literal(String.format("%d / %d", tabPage + 1, maxPages + 1));
 //        int width = this.font.width(page);
 //        guiGraphics.drawString(this.font, page.getVisualOrderText(), i + 126 - width / 2, j - 44, -1);
-        guiGraphics.blit(BACKGROUND_TEXTURE, 0, 0, 0, 0, 100, 100);
+        guiGraphics.blit(BACKGROUND_TEXTURE, 100, 100, 200, 150, 100, 100);
     }
 
 //    public void setBackgroundTexture(){
