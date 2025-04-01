@@ -8,11 +8,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -23,10 +26,16 @@ public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Direction> DATA_HORIZ = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
     private ItemStack noteItem;
+    private Player player;
+    private Level level;
+//    private PostItMenu menu;
 
-    public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, Direction facing, ItemStack item) {
+    public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, Direction facing, ItemStack item, Player player) {
         super(entityType, level);
         this.noteItem = item;
+        this.player = player;
+        this.level = level;
+//        this.menu = menu;
         if(face != null){
             this.getEntityData().set(DATA_SIDE, face.get3DDataValue());
         }
@@ -51,8 +60,9 @@ public class PostItEntity extends Entity {
         }
     }
 
-    public static void openScreen() {
-        Minecraft.getInstance().setScreen(new PostItMenu(Component.empty()));
+    public void openScreen() {
+//        player.openMenu(new SimpleMenuProvider((MenuConstructor) menu, Component.translatable("Post it note")));
+        Minecraft.getInstance().setScreen(new PostItMenu());
     }
 
     @Override

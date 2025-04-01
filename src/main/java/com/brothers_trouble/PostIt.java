@@ -36,8 +36,6 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 import static com.brothers_trouble.registration.EntityRegistry.ENTITY_TYPES;
-import static com.brothers_trouble.registration.RecipeRegistry.SERIALIZERS;
-import static com.brothers_trouble.registration.RecipeRegistry.TYPES;
 
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -45,6 +43,7 @@ import static com.brothers_trouble.registration.RecipeRegistry.TYPES;
 public class PostIt
 {
     // Define mod id in a common place for everything to reference
+//    public static final String MODID = "data/postit";
     public static final String MODID = "postit";
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();

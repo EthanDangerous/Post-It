@@ -16,17 +16,13 @@ public class RecipeRegistry{
             DeferredRegister.create(Registries.RECIPE_TYPE, PostIt.MODID);
 
     public static final DeferredHolder<RecipeType<?>, RecipeType<PageCutting>> PAGE_CUTTING_TYPE =
-            TYPES.register("page_cutting", () -> new RecipeType<>() {
-                @Override
-                public String toString() {
-                    return "page_cutting";
-                }
-            });
+            TYPES.register("page_cutting", () -> RecipeType.register("page_cutting"));
 
     public static final DeferredHolder<RecipeSerializer<?>, PageCutting.Serializer> PAGE_CUTTING_SERIALIZER =
             SERIALIZERS.register("page_cutting", PageCutting.Serializer::new);
 
     public static void register(IEventBus eventBus) {
+        System.out.println("REGISTERING CUSTOM RECIPES");
         SERIALIZERS.register(eventBus);
         TYPES.register(eventBus);
     }

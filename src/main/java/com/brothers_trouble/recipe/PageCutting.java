@@ -17,8 +17,11 @@ import static com.brothers_trouble.registration.RecipeRegistry.PAGE_CUTTING_TYPE
 
 public class PageCutting extends CustomRecipe {
 
+
+
     public PageCutting(){
         super(CraftingBookCategory.MISC);
+        System.out.println("CONSTRUCTOR FOR PAGE CUTTING RUN");
     }
 
     @Override
@@ -103,4 +106,6 @@ public class PageCutting extends CustomRecipe {
             return StreamCodec.unit(new PageCutting());
         }
     }
+
+//    public static RecipeType
 }
