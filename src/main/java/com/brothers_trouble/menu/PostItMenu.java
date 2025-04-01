@@ -25,7 +25,7 @@ public class PostItMenu extends Screen {
         super(Component.empty());
 //        this.level = level;
         this.layout = new HeaderAndFooterLayout(this);
-        this.addRenderableWidget(new CloseWidget(0, 0, 16, 16));
+        this.addRenderableWidget(new CloseWidget((this.width)-16, (this.height)-16, 16, 16));
 
 //        setBackgroundTexture();
     }
@@ -36,6 +36,7 @@ public class PostItMenu extends Screen {
 //        int width = this.font.width(page);
 //        guiGraphics.drawString(this.font, page.getVisualOrderText(), i + 126 - width / 2, j - 44, -1);
         guiGraphics.blit(BACKGROUND_TEXTURE, (this.width - 160)/2, (this.height - 160)/2, 0, 0, 160, 160);
+
     }
 
 //    public void setBackgroundTexture(){

@@ -62,7 +62,10 @@ public class PostItEntity extends Entity {
 
     public void openScreen() {
 //        player.openMenu(new SimpleMenuProvider((MenuConstructor) menu, Component.translatable("Post it note")));
-        Minecraft.getInstance().setScreen(new PostItMenu());
+        Minecraft minecraft = Minecraft.getInstance();
+        if(minecraft != null){
+            Minecraft.getInstance().setScreen(new PostItMenu());
+        }
     }
 
     @Override
