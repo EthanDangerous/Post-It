@@ -1,6 +1,8 @@
 package com.brothers_trouble.menu.widget;
 
 import com.brothers_trouble.PostIt;
+import com.brothers_trouble.menu.PostItMenu;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -15,7 +17,7 @@ public class CloseWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.blit(TEXTURE, getX(), getY(), 176, 0, 16, 16);
     }
 
@@ -26,6 +28,8 @@ public class CloseWidget extends AbstractWidget {
 
     @Override
     public void onClick(double mouseX, double mouseY, int button){
-
+        if(Minecraft.getInstance() != null){
+            Minecraft.getInstance().setScreen(null);
+        }
     }
 }

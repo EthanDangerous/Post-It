@@ -1,6 +1,7 @@
 package com.brothers_trouble.entity;
 
 import com.brothers_trouble.menu.PostItMenu;
+import com.brothers_trouble.registration.GUIRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -11,16 +12,21 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import org.apache.logging.log4j.core.jmx.Server;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
@@ -49,21 +55,28 @@ public class PostItEntity extends Entity {
     public @NotNull InteractionResult interact(Player player, @NotNull InteractionHand hand){
         if(player.isShiftKeyDown()){
             System.out.println("Interaction 1");
-
 //            player.addItem(noteItem);
             this.kill();
             return InteractionResult.SUCCESS;
         }else{
             System.out.println("Interaction 2");
-            openScreen();
+            if(Minecraft.getInstance() != null){
+                openScreen();
+            }
             return InteractionResult.SUCCESS;
         }
     }
 
     public void openScreen() {
 //        player.openMenu(new SimpleMenuProvider((MenuConstructor) menu, Component.translatable("Post it note")));
-        Minecraft minecraft = Minecraft.getInstance();
-        if(minecraft != null){
+//        player.openMenu(this);
+//        ServerPlayer player1 = (ServerPlayer) player;
+//        player1.openMenu(new SimpleMenuProvider(
+//                (containerId, playerInventory, player) -> new PostItMenu(containerId, playerInventory),
+//                Component.translatable("menu.title.examplemod.mymenu")
+//        ));
+//        ServerPlayer.openMenu(menuProvider, bytebuf -> {});
+        if(Minecraft.getInstance() != null && level().isClientSide()){
             Minecraft.getInstance().setScreen(new PostItMenu());
         }
     }
@@ -120,4 +133,9 @@ public class PostItEntity extends Entity {
     protected void addAdditionalSaveData(CompoundTag compoundTag) {
         compoundTag.putInt("Rotation", this.getEntityData().get(DATA_SIDE));
     }
+
+//    @Override
+//    public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+//        return new PostItMenu(i, inventory, this);
+//    }
 }
