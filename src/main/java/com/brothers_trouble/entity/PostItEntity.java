@@ -1,8 +1,12 @@
 package com.brothers_trouble.entity;
 
 import com.brothers_trouble.menu.PostItMenu;
+import com.brothers_trouble.menu.screen.PostItScreen;
 import com.brothers_trouble.registration.GUIRegistry;
+import com.brothers_trouble.registration.ItemRegistry;
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -23,17 +27,27 @@ import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.phys.AABB;
 import org.apache.logging.log4j.core.jmx.Server;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+
+import java.util.UUID;
 
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Direction> DATA_HORIZ = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
+//    public static final EntityDataAccessor<Component> TEXT_DATA = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.COMPONENT);
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final int MAX_TEXT_LINE_WIDTH = 90;
+    private static final int TEXT_LINE_HEIGHT = 10;
+    private Component textComponent = null;
     private ItemStack noteItem;
     private Player player;
     private Level level;
+    private SignText text;
 //    private PostItMenu menu;
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, Direction facing, ItemStack item, Player player) {
@@ -41,6 +55,8 @@ public class PostItEntity extends Entity {
         this.noteItem = item;
         this.player = player;
         this.level = level;
+        this.textComponent = item.get(ItemRegistry.NOTE);
+        this.text = new SignText();
 //        this.menu = menu;
         if(face != null){
             this.getEntityData().set(DATA_SIDE, face.get3DDataValue());
@@ -67,6 +83,38 @@ public class PostItEntity extends Entity {
         }
     }
 
+    public SignText getText(){
+        return this.text;
+    }
+
+    public int getMaxTextLineWidth() {
+        return 90;
+    }
+
+    public int getTextLineHeight() {
+        return 10;
+    }
+
+    public boolean playerIsTooFarAwayToEdit(UUID uuid) {
+        Player player = this.level.getPlayerByUUID(uuid);
+        return player == null || !player.canInteractWithBlock(this.getBlockPos(), 4.0);
+    }
+
+    public BlockPos getBlockPos(){
+        return this.getBlockPos();
+    }
+
+    public boolean setText(SignText text) {
+        this.text = text;
+        this.markUpdated();
+        return true;
+    }
+
+    private void markUpdated() {
+//        this.setChanged();
+//        this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 3);
+    }
+
     public void openScreen() {
 //        player.openMenu(new SimpleMenuProvider((MenuConstructor) menu, Component.translatable("Post it note")));
 //        player.openMenu(this);
@@ -77,7 +125,8 @@ public class PostItEntity extends Entity {
 //        ));
 //        ServerPlayer.openMenu(menuProvider, bytebuf -> {});
         if(Minecraft.getInstance() != null && level().isClientSide()){
-            Minecraft.getInstance().setScreen(new PostItMenu());
+//            Minecraft.getInstance().setScreen(new PostItMenu(this.textComponent));
+            Minecraft.getInstance().setScreen(new PostItScreen(this, this.textComponent));
         }
     }
 
@@ -120,6 +169,7 @@ public class PostItEntity extends Entity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_SIDE, 0);
         builder.define(DATA_HORIZ, Direction.NORTH);
+//        builder.define(TEXT_DATA, textComponent);
     }
 
     @Override
