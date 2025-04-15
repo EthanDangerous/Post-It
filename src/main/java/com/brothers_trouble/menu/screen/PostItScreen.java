@@ -6,9 +6,12 @@
 package com.brothers_trouble.menu.screen;
 
 import com.brothers_trouble.entity.PostItEntity;
+import com.brothers_trouble.menu.widget.CloseWidget;
 import com.mojang.blaze3d.platform.Lighting;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.font.TextFieldHelper;
@@ -19,58 +22,86 @@ import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
-import net.minecraft.world.level.block.SignBlock;
-import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.WoodType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
 
+import static com.brothers_trouble.menu.PostItMenu.BACKGROUND_TEXTURE;
+
 @OnlyIn(Dist.CLIENT)
 public class PostItScreen extends Screen {
+    //this is the actual entity you are clicking
     private final PostItEntity note;
+
+    //this is the widget to close the GUI
+    private CloseWidget closeWidget;
+
+    //this is the SignText object that actually contains our text
     private SignText text;
+
+    //this has the list of all of the messages that are being made
     private final String[] messages;
+
     private int frame;
     private int line;
+
+    //this should help out with the text fields?
     @Nullable
     private TextFieldHelper signField;
 
-    public PostItScreen(PostItEntity note, Component text) {
+    //this is the scale of the text
+    private static final Vector3f TEXT_SCALE = new Vector3f(0.9765628F, 0.9765628F, 0.9765628F);
+
+    //constructor, for when it is first created
+    public PostItScreen(PostItEntity note, SignText text) {
+        //creates the title of the GUI
         super(Component.translatable("POST IT NOTE TEXT"));
+        //sets note to the entity being selected
         this.note = note;
-        this.messages = (String[])IntStream.range(0, 4).mapToObj((p_277214_) -> {
-            return this.text.getMessage(p_277214_, false);
-        }).map(Component::getString).toArray((x$0) -> {
-            return new String[x$0];
-        });
+        //should get the SignText from the note entity
+        this.text = text;
+        if(this.text == null){
+            System.out.println("\n\nTHE getText() ISNT WORKING\n\n");
+        }
+//        this.text = new SignText();
+
+        //this should create the messages list with this thing \/ no clue how it works but it should work
+        //text.getMessage is being problematic here
+        this.messages = IntStream.range(0, 4).mapToObj((p_277214_) -> this.text.getMessage(p_277214_, false)).map(Component::getString).toArray((x$0) -> new String[x$0]);
     }
 
+    //when the GUI is actually initialized (is it each time its opened?)
     protected void init() {
-        this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (p_251194_) -> {
-            this.onDone();
-        }).bounds(this.width / 2 - 100, this.height / 4 + 144, 200, 20).build());
-        this.signField = new TextFieldHelper(() -> {
-            return this.messages[this.line];
-        }, this::setMessage, TextFieldHelper.createClipboardGetter(this.minecraft), TextFieldHelper.createClipboardSetter(this.minecraft), (p_280850_) -> {
-            return this.minecraft.font.width(p_280850_) <= this.note.getMaxTextLineWidth();
-        });
+        //adds a done button
+//        this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (p_251194_) -> {
+//            this.onDone();
+//        }).bounds(this.width / 2 - 100, this.height / 4 + 144, 200, 20).build());
+
+        //this is for the close button
+        this.closeWidget = new CloseWidget((this.width+144)/2, (this.height-176)/2, 16, 16);
+        this.addRenderableWidget(closeWidget);
+
+        //this should create the text field and get the players clipboard?
+        this.signField = new TextFieldHelper(() -> this.messages[this.line], this::setMessage, TextFieldHelper.createClipboardGetter(this.minecraft), TextFieldHelper.createClipboardSetter(this.minecraft), (p_280850_) -> this.minecraft.font.width(p_280850_) <= this.note.getMaxTextLineWidth());
     }
 
+    //this is just for the blinking cursor
     public void tick() {
         ++this.frame;
         if (!this.isValid()) {
-            this.onDone();
+//            this.onDone();
         }
-
     }
 
+    //check this later, not right now.
     private boolean isValid() {
-        return this.minecraft != null && this.minecraft.player != null && !this.note.isRemoved() && !this.note.playerIsTooFarAwayToEdit(this.minecraft.player.getUUID());
+//        return this.minecraft != null && this.minecraft.player != null && !this.note.isRemoved() && !this.note.playerIsTooFarAwayToEdit(this.minecraft.player.getUUID());
+        return true;
     }
 
+    //whenever a player presses any button
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == 265) {
             this.line = this.line - 1 & 3;
@@ -85,11 +116,14 @@ public class PostItScreen extends Screen {
         }
     }
 
+    //when a player types a character
     public boolean charTyped(char codePoint, int modifiers) {
+        //checks if its a valid character, puts it in the cursor position
         this.signField.charTyped(codePoint);
         return true;
     }
 
+    //this is the render for the GUI
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         Lighting.setupForFlatItems();
@@ -99,7 +133,10 @@ public class PostItScreen extends Screen {
     }
 
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderTransparentBackground(guiGraphics);
+//        this.renderTransparentBackground(guiGraphics);
+        this.renderBlurredBackground(partialTick);
+        this.renderMenuBackground(guiGraphics);
+        guiGraphics.blit(BACKGROUND_TEXTURE, (this.width - 160)/2, (this.height - 160)/2, 0, 0, 160, 160);
     }
 
     public void onClose() {
@@ -111,7 +148,6 @@ public class PostItScreen extends Screen {
         if (clientpacketlistener != null) {
             clientpacketlistener.send(new ServerboundSignUpdatePacket(this.note.getBlockPos(), true, this.messages[0], this.messages[1], this.messages[2], this.messages[3]));
         }
-
     }
 
     public boolean isPauseScreen() {
@@ -124,14 +160,16 @@ public class PostItScreen extends Screen {
 
     protected Vector3f getSignTextScale(){
 
-        return null;
+        return TEXT_SCALE;
     }
 
     protected void offsetSign(GuiGraphics guiGraphics, BlockState state) {
         guiGraphics.pose().translate((float)this.width / 2.0F, 90.0F, 50.0F);
     }
 
+    //this should render eveything needed in the sign
     private void renderSign(GuiGraphics guiGraphics) {
+        //these are commented out because they take from the blockstate of the sign. later it would be good to use this to get the colors of the notes
 //        BlockState blockstate = this.note.getBlockState();
 //        guiGraphics.pose().pushPose();
 //        this.offsetSign(guiGraphics, blockstate);
@@ -207,6 +245,8 @@ public class PostItScreen extends Screen {
     }
 
     private void onDone() {
-        this.minecraft.setScreen((Screen)null);
+        if(Minecraft.getInstance() != null){
+            Minecraft.getInstance().setScreen(null);
+        }
     }
 }

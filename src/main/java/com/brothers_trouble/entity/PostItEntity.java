@@ -4,15 +4,23 @@ import com.brothers_trouble.menu.PostItMenu;
 import com.brothers_trouble.menu.screen.PostItScreen;
 import com.brothers_trouble.registration.GUIRegistry;
 import com.brothers_trouble.registration.ItemRegistry;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -34,7 +42,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
@@ -47,7 +57,7 @@ public class PostItEntity extends Entity {
     private ItemStack noteItem;
     private Player player;
     private Level level;
-    private SignText text;
+    private static SignText text;
 //    private PostItMenu menu;
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, Direction facing, ItemStack item, Player player) {
@@ -101,7 +111,7 @@ public class PostItEntity extends Entity {
     }
 
     public BlockPos getBlockPos(){
-        return this.getBlockPos();
+        return this.getOnPos();
     }
 
     public boolean setText(SignText text) {
@@ -126,7 +136,7 @@ public class PostItEntity extends Entity {
 //        ServerPlayer.openMenu(menuProvider, bytebuf -> {});
         if(Minecraft.getInstance() != null && level().isClientSide()){
 //            Minecraft.getInstance().setScreen(new PostItMenu(this.textComponent));
-            Minecraft.getInstance().setScreen(new PostItScreen(this, this.textComponent));
+            Minecraft.getInstance().setScreen(new PostItScreen(this, this.text));
         }
     }
 
@@ -182,6 +192,52 @@ public class PostItEntity extends Entity {
     @Override
     protected void addAdditionalSaveData(CompoundTag compoundTag) {
         compoundTag.putInt("Rotation", this.getEntityData().get(DATA_SIDE));
+    }
+
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+//        super.addAdditionalSaveData(tag);
+        DynamicOps<Tag> dynamicops = registries.createSerializationContext(NbtOps.INSTANCE);
+        DataResult var10000 = SignText.DIRECT_CODEC.encodeStart(dynamicops, this.text);
+        Logger var10001 = LOGGER;
+        Objects.requireNonNull(var10001);
+        var10000.resultOrPartial((Consumer<String>) var10001).ifPresent((p_277417_) -> {
+            tag.put("text", (Tag) p_277417_);
+        });
+    }
+
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+//        super.readAdditionalSaveData(tag);
+        DynamicOps<Tag> dynamicops = registries.createSerializationContext(NbtOps.INSTANCE);
+        DataResult var10000;
+        Logger var10001;
+        var10000 = SignText.DIRECT_CODEC.parse(dynamicops, tag.getCompound("front_text"));
+        var10001 = LOGGER;
+        Objects.requireNonNull(var10001);
+        var10000.resultOrPartial((Consumer<String>) var10001).ifPresent((p_278212_) -> {
+            this.text = this.loadLines((SignText) p_278212_);
+        });
+    }
+
+    private SignText loadLines(SignText text) {
+        for(int i = 0; i < 4; ++i) {
+            Component component = this.loadLine(text.getMessage(i, false));
+            Component component1 = this.loadLine(text.getMessage(i, true));
+            text = text.setMessage(i, component, component1);
+        }
+
+        return text;
+    }
+
+    private Component loadLine(Component lineText) {
+        Level var3 = this.level;
+        if (var3 instanceof ServerLevel serverlevel) {
+            try {
+                return ComponentUtils.updateForEntity(createCommandSourceStack(), lineText, (Entity)null, 0);
+            } catch (CommandSyntaxException var4) {
+            }
+        }
+
+        return lineText;
     }
 
 //    @Override
