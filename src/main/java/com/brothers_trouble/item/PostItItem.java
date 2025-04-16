@@ -1,7 +1,6 @@
 package com.brothers_trouble.item;
 
 import com.brothers_trouble.entity.PostItEntity;
-import com.brothers_trouble.menu.PostItMenu;
 import com.brothers_trouble.registration.EntityRegistry;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;

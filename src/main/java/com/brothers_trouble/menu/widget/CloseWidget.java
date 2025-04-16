@@ -1,7 +1,6 @@
 package com.brothers_trouble.menu.widget;
 
 import com.brothers_trouble.PostIt;
-import com.brothers_trouble.menu.PostItMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;

@@ -1,8 +1,6 @@
 package com.brothers_trouble.entity;
 
-import com.brothers_trouble.menu.PostItMenu;
 import com.brothers_trouble.menu.screen.PostItScreen;
-import com.brothers_trouble.registration.GUIRegistry;
 import com.brothers_trouble.registration.ItemRegistry;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.logging.LogUtils;
@@ -21,25 +19,16 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuConstructor;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.phys.AABB;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.Objects;
@@ -98,11 +87,11 @@ public class PostItEntity extends Entity {
     }
 
     public int getMaxTextLineWidth() {
-        return 90;
+        return 120;
     }
 
     public int getTextLineHeight() {
-        return 10;
+        return 12;
     }
 
     public boolean playerIsTooFarAwayToEdit(UUID uuid) {

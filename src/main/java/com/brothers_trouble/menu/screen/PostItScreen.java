@@ -13,13 +13,11 @@ import javax.annotation.Nullable;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
 import net.minecraft.world.level.block.entity.SignText;
@@ -52,12 +50,14 @@ public class PostItScreen extends Screen {
     private TextFieldHelper signField;
 
     //this is the scale of the text
-    private static final Vector3f TEXT_SCALE = new Vector3f(0.9765628F, 0.9765628F, 0.9765628F);
+    private static final float originalScale = 0.9765628F;
+    private static float finalScale = originalScale * 1f;
+    private static final Vector3f TEXT_SCALE = new Vector3f(finalScale, finalScale, finalScale);
 
     //constructor, for when it is first created
     public PostItScreen(PostItEntity note, SignText text) {
         //creates the title of the GUI
-        super(Component.translatable("POST IT NOTE TEXT"));
+        super(Component.empty());
         //sets note to the entity being selected
         this.note = note;
         //should get the SignText from the note entity
@@ -85,6 +85,12 @@ public class PostItScreen extends Screen {
 
         //this should create the text field and get the players clipboard?
         this.signField = new TextFieldHelper(() -> this.messages[this.line], this::setMessage, TextFieldHelper.createClipboardGetter(this.minecraft), TextFieldHelper.createClipboardSetter(this.minecraft), (p_280850_) -> this.minecraft.font.width(p_280850_) <= this.note.getMaxTextLineWidth());
+        this.line = 0;
+        this.setMessage("WORDS WORDS WORDS");
+        this.line = 1;
+        this.setMessage("WORDS2 WORDS2 WORDS2");
+        this.line = 2;
+        this.setMessage("WORDS3 WORDS3 WORDS3");
     }
 
     //this is just for the blinking cursor
@@ -140,6 +146,10 @@ public class PostItScreen extends Screen {
     }
 
     public void onClose() {
+        //do some check to see the text
+        for(String each : messages){
+            System.out.println(each);
+        }
         this.onDone();
     }
 
@@ -171,7 +181,7 @@ public class PostItScreen extends Screen {
     private void renderSign(GuiGraphics guiGraphics) {
         //these are commented out because they take from the blockstate of the sign. later it would be good to use this to get the colors of the notes
 //        BlockState blockstate = this.note.getBlockState();
-//        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushPose();
 //        this.offsetSign(guiGraphics, blockstate);
 //        guiGraphics.pose().pushPose();
 //        this.renderSignBackground(guiGraphics, blockstate);
@@ -188,47 +198,55 @@ public class PostItScreen extends Screen {
         boolean flag = this.frame / 6 % 2 == 0;
         int j = this.signField.getCursorPos();
         int k = this.signField.getSelectionPos();
-        int l = 4 * this.note.getTextLineHeight() / 2;
-        int i1 = this.line * this.note.getTextLineHeight() - l;
+        int textGap = 4 * this.note.getTextLineHeight() / 2;
+        int i1 = this.line * this.note.getTextLineHeight() + textGap;
 
-        int j1;
-        String s1;
-        int l3;
+        int messageIndex;
+        String lineText;
+        int xPos;
         int i4;
         int j4;
-        for(j1 = 0; j1 < this.messages.length; ++j1) {
-            s1 = this.messages[j1];
-            if (s1 != null) {
+        for(messageIndex = 0; messageIndex < this.messages.length; ++messageIndex) {
+            //the list of all of the
+            lineText = this.messages[messageIndex];
+            if (lineText != null) {
                 if (this.font.isBidirectional()) {
-                    s1 = this.font.bidirectionalShaping(s1);
+                    lineText = this.font.bidirectionalShaping(lineText);
                 }
 
-                l3 = -this.font.width(s1) / 2;
-                guiGraphics.drawString(this.font, s1, l3, j1 * this.note.getTextLineHeight() - l, i, false);
-                if (j1 == this.line && j >= 0 && flag) {
-                    i4 = this.font.width(s1.substring(0, Math.max(Math.min(j, s1.length()), 0)));
-                    j4 = i4 - this.font.width(s1) / 2;
-                    if (j >= s1.length()) {
+                //the x position of the text should always be centered at the middle of the note.
+                //that means the ex position needs to be
+
+                xPos = this.width/2 - this.font.width(lineText) / 2;
+                guiGraphics.drawString(this.font, lineText, xPos, (this.height/2) + messageIndex * this.note.getTextLineHeight(), i, false);
+//                System.out.println("TRIED TO DRAW STRING OF " + lineText + " AT " + xPos + ", " + (messageIndex * this.note.getTextLineHeight() + textGap));
+                if (messageIndex == this.line && j >= 0 && flag) {
+                    //the width of the string starting from index 0 and ending at the final index, ensuring it doesnt go past what is allowed or into negatives
+                    i4 = this.font.width(lineText.substring(0, Math.max(Math.min(j, lineText.length()), 0)));
+                    //this gets the middle of the screen,
+                    j4 = (this.width/2) + i4;
+//                    j4 = (this.width/2) + i4 + this.font.width(lineText) / 2;
+                    if (j >= lineText.length()) {
                         guiGraphics.drawString(this.font, "_", j4, i1, i, false);
                     }
                 }
             }
         }
 
-        for(j1 = 0; j1 < this.messages.length; ++j1) {
-            s1 = this.messages[j1];
-            if (s1 != null && j1 == this.line && j >= 0) {
-                l3 = this.font.width(s1.substring(0, Math.max(Math.min(j, s1.length()), 0)));
-                i4 = l3 - this.font.width(s1) / 2;
-                if (flag && j < s1.length()) {
+        for(messageIndex = 0; messageIndex < this.messages.length; ++messageIndex) {
+            lineText = this.messages[messageIndex];
+            if (lineText != null && messageIndex == this.line && j >= 0) {
+                xPos = this.font.width(lineText.substring(0, Math.max(Math.min(j, lineText.length()), 0)));
+                i4 = xPos - this.font.width(lineText) / 2;
+                if (flag && j < lineText.length()) {
                     guiGraphics.fill(i4, i1 - 1, i4 + 1, i1 + this.note.getTextLineHeight(), -16777216 | i);
                 }
 
                 if (k != j) {
                     j4 = Math.min(j, k);
                     int j2 = Math.max(j, k);
-                    int k2 = this.font.width(s1.substring(0, j4)) - this.font.width(s1) / 2;
-                    int l2 = this.font.width(s1.substring(0, j2)) - this.font.width(s1) / 2;
+                    int k2 = this.font.width(lineText.substring(0, j4)) - this.font.width(lineText) / 2;
+                    int l2 = this.font.width(lineText.substring(0, j2)) - this.font.width(lineText) / 2;
                     int i3 = Math.min(k2, l2);
                     int j3 = Math.max(k2, l2);
                     guiGraphics.fill(RenderType.guiTextHighlight(), i3, i1, j3, i1 + this.note.getTextLineHeight(), -16776961);

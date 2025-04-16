@@ -1,7 +1,6 @@
 package com.brothers_trouble.registration;
 
 import com.brothers_trouble.PostIt;
-import com.brothers_trouble.menu.PostItMenu;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
