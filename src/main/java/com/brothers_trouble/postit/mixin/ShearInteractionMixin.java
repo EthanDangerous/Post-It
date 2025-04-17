@@ -2,6 +2,8 @@ package com.brothers_trouble.postit.mixin;
 
 import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.registration.ItemRegistry;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -23,19 +25,19 @@ public class ShearInteractionMixin {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostIt.MODID);
     @Inject(method = "overrideOtherStackedOnMe", at = @At("HEAD"), cancellable = true)
     private void postit$doPaperShearing(ItemStack stack, ItemStack other, Slot slot, ClickAction action, Player player, SlotAccess access, CallbackInfoReturnable<Boolean> cir) {
-        LOGGER.debug("MIXIN STARTED THE THING");
-        LOGGER.debug(stack.toString());
-        LOGGER.debug(slot.toString());
-        LOGGER.debug(action.toString());
-        LOGGER.debug(player.toString());
-        LOGGER.debug("MIXIN DID ITS LOGGING THING");
+        LOGGER.info("MIXIN START");
+        LOGGER.info(stack.toString());
+        LOGGER.info(other.toString());
+        LOGGER.info(action.toString());
 
         if (other.getItem() == Items.SHEARS && action == ClickAction.SECONDARY && stack.getItem() == Items.PAPER) {
-//            ItemStack slotItem = stack.getItem();
-            stack.shrink(1);
-            other.setDamageValue(other.getDamageValue()-1);
-            player.addItem(new ItemStack(ItemRegistry.POST_IT_NOTE, 4));
-            player.level().playSound(SoundEvents., 0.8F, 0.8F + player.level().getRandom().nextFloat() * 0.4F);
+            LOGGER.info("CORRECT SEQUENCE");
+            if(!player.level().isClientSide){
+                stack.shrink(1);
+                other.hurtAndBreak(1, (ServerLevel) player.level(), (ServerPlayer) player, (i) -> {});
+                player.addItem(new ItemStack(ItemRegistry.POST_IT_NOTE, 4));
+                player.playSound(SoundEvents.SHEEP_SHEAR, 0.8F, 0.8F + player.level().getRandom().nextFloat() * 0.4F);
+            }
             cir.setReturnValue(true);
         }
     }
