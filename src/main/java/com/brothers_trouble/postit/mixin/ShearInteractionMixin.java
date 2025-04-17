@@ -2,7 +2,9 @@ package com.brothers_trouble.postit.mixin;
 
 import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.registration.ItemRegistry;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
@@ -28,10 +30,12 @@ public class ShearInteractionMixin {
         LOGGER.debug(player.toString());
         LOGGER.debug("MIXIN DID ITS LOGGING THING");
 
-        if (other.getItem() == Items.PAPER && action == ClickAction.SECONDARY && stack.getItem() == Items.SHEARS) {
+        if (other.getItem() == Items.SHEARS && action == ClickAction.SECONDARY && stack.getItem() == Items.PAPER) {
 //            ItemStack slotItem = stack.getItem();
             stack.shrink(1);
+            other.setDamageValue(other.getDamageValue()-1);
             player.addItem(new ItemStack(ItemRegistry.POST_IT_NOTE, 4));
+            player.level().playSound(SoundEvents., 0.8F, 0.8F + player.level().getRandom().nextFloat() * 0.4F);
             cir.setReturnValue(true);
         }
     }
