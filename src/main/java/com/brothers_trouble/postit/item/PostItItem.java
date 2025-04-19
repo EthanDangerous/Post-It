@@ -7,11 +7,13 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 public class PostItItem extends Item{
+//    private DyedItemColor color = new DyedItemColor();
     public PostItItem(Properties properties) {
         super(properties);
     }
@@ -34,6 +36,7 @@ public class PostItItem extends Item{
             PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side, facing, itemstack, player);
             System.out.println(level.isClientSide() + "<client side? : block face>" + side);
             postItEntity.setPos(vec3);
+
 
             level.addFreshEntity(postItEntity);
             context.getItemInHand().shrink(1);

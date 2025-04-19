@@ -6,7 +6,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.SlotAccess;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
@@ -22,16 +21,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Item.class)
 public class ShearInteractionMixin {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PostIt.MODID);
+//    private static final Logger LOGGER = LoggerFactory.getLogger(PostIt.MODID);
     @Inject(method = "overrideOtherStackedOnMe", at = @At("HEAD"), cancellable = true)
     private void postit$doPaperShearing(ItemStack stack, ItemStack other, Slot slot, ClickAction action, Player player, SlotAccess access, CallbackInfoReturnable<Boolean> cir) {
-        LOGGER.info("MIXIN START");
-        LOGGER.info(stack.toString());
-        LOGGER.info(other.toString());
-        LOGGER.info(action.toString());
-
         if (other.getItem() == Items.SHEARS && action == ClickAction.SECONDARY && stack.getItem() == Items.PAPER) {
-            LOGGER.info("CORRECT SEQUENCE");
             if(!player.level().isClientSide){
                 stack.shrink(1);
                 other.hurtAndBreak(1, (ServerLevel) player.level(), (ServerPlayer) player, (i) -> {});
