@@ -1,9 +1,11 @@
 package com.brothers_trouble.postit;
 
+import com.brothers_trouble.postit.item.PostItItem;
 import com.brothers_trouble.postit.registration.ItemRegistry;
 import com.brothers_trouble.postit.registration.ModelRegistry;
 import com.brothers_trouble.postit.registration.RecipeRegistry;
 import com.brothers_trouble.postit.registration.RenderRegistry;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.registries.*;
 import org.slf4j.Logger;
 
@@ -34,6 +36,9 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 
 import static com.brothers_trouble.postit.registration.EntityRegistry.ENTITY_TYPES;
 
@@ -138,6 +143,24 @@ public class PostIt
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents
     {
+
+        @SubscribeEvent
+        public static void onRegisterColorHandlers(RegisterColorHandlersEvent.Item event) {
+            event.register(new ItemColor() {
+                @Override
+                public int getColor(ItemStack stack, int tintIndex) {
+                    if (tintIndex == 0) {
+                        // Get the color from your item
+                        if (stack.getItem() instanceof PostItItem postIt) {
+                            return postIt.getColor(stack);
+                        }
+                        return 0xFFFF00; // Default yellow color
+                    }
+                    return -1;
+                }
+            }, ItemRegistry.POST_IT_NOTE.get());
+        }
+
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
@@ -145,5 +168,35 @@ public class PostIt
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
         }
+//        @SubscribeEvent
+//        public static void registerItemColors(RegisterColorHandlersEvent.Item event){
+//            event.register(
+//                    (stack, tintIndex) -> {
+//                        boolean enabled = Optional.ofNullable(stack.get(ModDataComponents.ITEM_ENABLED)).orElse(false);
+//                        if(enabled){
+//                            if(tintIndex == 1){
+//                                return 0xFFFFFFFF;
+//                            } else if(tintIndex == 2){
+//                                double SCALAR = 1.5f;
+//                                double hue = ((440f * (1.0d/SCALAR)) + (System.currentTimeMillis() % (360 * (1.0d/SCALAR))));
+//                                return Mth.hsvToRgb((float) (( hue / 360.0f) * (0.4f * SCALAR)), 0.55F, 1.0F) | 0xFF000000;
+//                            }
+//                        } else {
+//                            if(tintIndex == 1){
+//                                return 0x00000000;
+//                            } else if(tintIndex == 2){
+//                                return 0x00000000;
+//                            }
+//                        }
+//                        return -1;
+//                    }, ModItems.ELECTRIC_SWORD.get());
+//            event.register((stack, idx) -> {
+//                if(stack.getItem() instanceof EnergyStoringItem energyStoringItem){
+//                    return 0xFF000000 | Mth.hsvToRgb(0.0f,
+//                            Math.max(0.3f, ((float)energyStoringItem.getEnergyStored(stack) / energyStoringItem.getMaxEnergyStored(stack))), 1.0f);
+//                }
+//                return -1;
+//            }, ModItems.HUGE_BATTERY.get());
+//        }
     }
 }
