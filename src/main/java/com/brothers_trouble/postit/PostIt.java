@@ -147,11 +147,16 @@ public class PostIt
         @SubscribeEvent
         public static void onRegisterItemColorHandlers(RegisterColorHandlersEvent.Item event){
             event.register((stack, tintIndex) -> {
-                int tintInt = (int) stack.getOrDefault(DataComponents.DYED_COLOR, 0);
+                int tintInt = PostItItem.getDyeColor(stack);
 
                 if(tintInt == 0){
 //                    return Color.HSBtoRGB(0.5F, 0.5F, 1F);
                     return Color.GREEN.getRGB();
+//                    return 15;
+                }if(tintInt == 15){
+//                    return Color.HSBtoRGB(0.5F, 0.5F, 1F);
+                    return Color.RED.getRGB();
+//                    return 15;
                 } else{
                     return -1;
                 }

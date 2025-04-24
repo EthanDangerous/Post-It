@@ -19,6 +19,7 @@ public class PostItItem extends Item{
 
 //    public static final String COLOR_TAG = "Color";
 
+
     public PostItItem(Properties properties) {
         super(properties);
     }
@@ -29,14 +30,14 @@ public class PostItItem extends Item{
 ////        return stack;
 //    }
 
-    public void setDyeColor(ItemStack stack, DyeColor color) {
+    public void setDyeColor(ItemStack stack, int dyeColor) {
         // Create a DyedItemColor object from the DyeColor
-        stack.set(DataComponents.DYED_COLOR, new DyedItemColor(0xFFFFFF, false));
+        stack.set(DataComponents.DYED_COLOR, new DyedItemColor(dyeColor, false));
     }
 
     // Method to get the dye color
     public static int getDyeColor(ItemStack stack) {
-        return (int) stack.getOrDefault(DataComponents.DYED_COLOR, 0);
+        return stack.get(DataComponents.DYED_COLOR).rgb();
     }
 
     @Override
@@ -57,7 +58,7 @@ public class PostItItem extends Item{
 
             level.addFreshEntity(postItEntity);
             context.getItemInHand().shrink(1);
-//            setDyeColor(itemstack, DyeColor.RED);
+            setDyeColor(itemstack, 15);
 
             return InteractionResult.SUCCESS;
         }
