@@ -3,9 +3,11 @@ package com.brothers_trouble.postit.item;
 import com.brothers_trouble.postit.entity.PostItEntity;
 import com.brothers_trouble.postit.registration.EntityRegistry;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
@@ -14,28 +16,28 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 public class PostItItem extends Item{
-//    private DyedItemColor color;
-    private Component color;
+
+//    public static final String COLOR_TAG = "Color";
 
     public PostItItem(Properties properties) {
         super(properties);
-//        this.color = new Component();
-//        this.color = new DyedItemColor();
     }
 
-    public int getColor(ItemStack stack) {
-        // Use NBT or the DyedItemColor component to get the color
-//        return stack.getOrCreate(DyedItemColor.COMPONENT).getColor();
-        return -1;
-    }
-
-    public void setColor(ItemStack stack, int color) {
-//        stack.set(DyedItemColor.COMPONENT, new DyedItemColor(color));
-    }
-
-//    protected boolean mayPlace(Player player, Direction direction, ItemStack itemStack, BlockPos pos) {
-//        return !player.level().isOutsideBuildHeight(pos) && player.mayUseItemAt(pos, direction, itemStack);
+//    // Method to set the dye color
+//    public void setDyeColor(ItemStack stack, int color) {
+//        stack.set(DataComponents.DYED_COLOR, color);
+////        return stack;
 //    }
+
+    public void setDyeColor(ItemStack stack, DyeColor color) {
+        // Create a DyedItemColor object from the DyeColor
+        stack.set(DataComponents.DYED_COLOR, new DyedItemColor(0xFFFFFF, false));
+    }
+
+    // Method to get the dye color
+    public static int getDyeColor(ItemStack stack) {
+        return (int) stack.getOrDefault(DataComponents.DYED_COLOR, 0);
+    }
 
     @Override
     //create the method for when the item is being used on a block, taking in the context of UseOnContext
@@ -55,9 +57,11 @@ public class PostItItem extends Item{
 
             level.addFreshEntity(postItEntity);
             context.getItemInHand().shrink(1);
+//            setDyeColor(itemstack, DyeColor.RED);
 
             return InteractionResult.SUCCESS;
         }
+//        setDyeColor(itemstack, DyeColor.RED);
         return InteractionResult.FAIL;
     }
 

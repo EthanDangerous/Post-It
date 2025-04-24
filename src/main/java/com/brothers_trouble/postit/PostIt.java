@@ -5,6 +5,9 @@ import com.brothers_trouble.postit.registration.ItemRegistry;
 import com.brothers_trouble.postit.registration.ModelRegistry;
 import com.brothers_trouble.postit.registration.RecipeRegistry;
 import com.brothers_trouble.postit.registration.RenderRegistry;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.registries.*;
 import org.slf4j.Logger;
@@ -16,10 +19,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -37,8 +36,9 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.minecraft.client.color.item.ItemColor;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+
+import java.awt.*;
 
 import static com.brothers_trouble.postit.registration.EntityRegistry.ENTITY_TYPES;
 
@@ -145,21 +145,20 @@ public class PostIt
     {
 
         @SubscribeEvent
-        public static void onRegisterColorHandlers(RegisterColorHandlersEvent.Item event) {
-            event.register(new ItemColor() {
-                @Override
-                public int getColor(ItemStack stack, int tintIndex) {
-                    if (tintIndex == 0) {
-                        // Get the color from your item
-                        if (stack.getItem() instanceof PostItItem postIt) {
-                            return postIt.getColor(stack);
-                        }
-                        return 0xFFFF00; // Default yellow color
-                    }
+        public static void onRegisterItemColorHandlers(RegisterColorHandlersEvent.Item event){
+            event.register((stack, tintIndex) -> {
+                int tintInt = (int) stack.getOrDefault(DataComponents.DYED_COLOR, 0);
+
+                if(tintInt == 0){
+//                    return Color.HSBtoRGB(0.5F, 0.5F, 1F);
+                    return Color.GREEN.getRGB();
+                } else{
                     return -1;
                 }
             }, ItemRegistry.POST_IT_NOTE.get());
         }
+//                DyedItemColor tintInt = stack.getOrDefault(DataComponents.DYED_COLOR, null);
+//                int tintInt = PostItItem.getDyeColor(stack);
 
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
