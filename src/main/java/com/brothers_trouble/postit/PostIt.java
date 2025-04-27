@@ -3,6 +3,7 @@ package com.brothers_trouble.postit;
 import com.brothers_trouble.postit.item.PostItItem;
 import com.brothers_trouble.postit.registration.ItemRegistry;
 import com.brothers_trouble.postit.registration.ModelRegistry;
+//import com.brothers_trouble.postit.registration.RecipeRegistry;
 import com.brothers_trouble.postit.registration.RecipeRegistry;
 import com.brothers_trouble.postit.registration.RenderRegistry;
 import net.minecraft.core.component.DataComponents;
@@ -147,19 +148,19 @@ public class PostIt
         @SubscribeEvent
         public static void onRegisterItemColorHandlers(RegisterColorHandlersEvent.Item event){
             event.register((stack, tintIndex) -> {
-                int tintInt = PostItItem.getDyeColor(stack);
-
-                if(tintInt == 0){
-//                    return Color.HSBtoRGB(0.5F, 0.5F, 1F);
-                    return Color.GREEN.getRGB();
-//                    return 15;
-                }if(tintInt == 15){
-//                    return Color.HSBtoRGB(0.5F, 0.5F, 1F);
-                    return Color.RED.getRGB();
-//                    return 15;
-                } else{
-                    return -1;
-                }
+                return PostItItem.getDyeColor(stack);
+//                if(tintInt == 0){
+////                    return Color.HSBtoRGB(0.5F, 0.5F, 1F);
+//                    return Color.GREEN.getRGB();
+////                    return new Color(tintInt, false);
+////                    return tintInt;
+//                }if(tintInt == 15){
+////                    return Color.HSBtoRGB(0.5F, 0.5F, 1F);
+//                    return Color.RED.getRGB();
+////                    return 15;
+//                } else{
+//                    return -1;
+//                }
             }, ItemRegistry.POST_IT_NOTE.get());
         }
 //                DyedItemColor tintInt = stack.getOrDefault(DataComponents.DYED_COLOR, null);

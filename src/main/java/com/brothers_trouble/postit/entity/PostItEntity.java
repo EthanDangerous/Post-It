@@ -64,7 +64,7 @@ public class PostItEntity extends Entity {
             this.getEntityData().set(DATA_HORIZ, facing);
         }
         makeBoundingBox();
-        System.out.println("EntityDataAccessor: " + this.getEntityData().get(DATA_SIDE));
+//        System.out.println("EntityDataAccessor: " + this.getEntityData().get(DATA_SIDE));
     }
 
     public @NotNull InteractionResult interact(Player player, @NotNull InteractionHand hand){

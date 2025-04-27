@@ -1,7 +1,7 @@
 package com.brothers_trouble.postit.registration;
 
 import com.brothers_trouble.postit.PostIt;
-import com.brothers_trouble.postit.recipe.PageCutting;
+import com.brothers_trouble.postit.recipe.NoteColoring;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -15,11 +15,11 @@ public class RecipeRegistry{
     public static final DeferredRegister<RecipeType<?>> TYPES =
             DeferredRegister.create(Registries.RECIPE_TYPE, PostIt.MODID);
 
-    public static final DeferredHolder<RecipeType<?>, RecipeType<PageCutting>> PAGE_CUTTING_TYPE =
-            TYPES.register("page_cutting", () -> RecipeType.register("page_cutting"));
+    public static final DeferredHolder<RecipeType<?>, RecipeType<NoteColoring>> NOTE_COLORING_TYPE =
+            TYPES.register("note_coloring", () -> RecipeType.register("note_coloring"));
 
-    public static final DeferredHolder<RecipeSerializer<?>, PageCutting.Serializer> PAGE_CUTTING_SERIALIZER =
-            SERIALIZERS.register("page_cutting", PageCutting.Serializer::new);
+//    public static final DeferredHolder<RecipeSerializer<?>, NoteColoring.Serializer> NOTE_COLORING_SERIALIZER =
+//            SERIALIZERS.register("note_coloring", NoteColoring.Serializer::new);
 
     public static void register(IEventBus eventBus) {
         System.out.println("REGISTERING CUSTOM RECIPES");
