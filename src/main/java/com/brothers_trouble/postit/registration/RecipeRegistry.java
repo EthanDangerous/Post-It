@@ -16,7 +16,13 @@ public class RecipeRegistry{
             DeferredRegister.create(Registries.RECIPE_TYPE, PostIt.MODID);
 
     public static final DeferredHolder<RecipeType<?>, RecipeType<NoteColoring>> NOTE_COLORING_TYPE =
-            TYPES.register("note_coloring", () -> RecipeType.register("note_coloring"));
+            TYPES.register("note_coloring", () -> new RecipeType<>() {
+                @Override
+                public String toString() {
+                    return "postit:note_coloring";
+                }
+            });
+//                    () -> RecipeType.register("note_coloring"));
 
     public static final DeferredHolder<RecipeSerializer<?>, NoteColoring.Serializer> NOTE_COLORING_SERIALIZER =
             SERIALIZERS.register("note_coloring", NoteColoring.Serializer::new);
