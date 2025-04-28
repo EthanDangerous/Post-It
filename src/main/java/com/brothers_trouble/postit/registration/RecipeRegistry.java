@@ -18,8 +18,8 @@ public class RecipeRegistry{
     public static final DeferredHolder<RecipeType<?>, RecipeType<NoteColoring>> NOTE_COLORING_TYPE =
             TYPES.register("note_coloring", () -> RecipeType.register("note_coloring"));
 
-//    public static final DeferredHolder<RecipeSerializer<?>, NoteColoring.Serializer> NOTE_COLORING_SERIALIZER =
-//            SERIALIZERS.register("note_coloring", NoteColoring.Serializer::new);
+    public static final DeferredHolder<RecipeSerializer<?>, NoteColoring.Serializer> NOTE_COLORING_SERIALIZER =
+            SERIALIZERS.register("note_coloring", NoteColoring.Serializer::new);
 
     public static void register(IEventBus eventBus) {
         System.out.println("REGISTERING CUSTOM RECIPES");

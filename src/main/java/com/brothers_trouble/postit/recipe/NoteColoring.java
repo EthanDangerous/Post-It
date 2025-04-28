@@ -16,16 +16,16 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.neoforged.neoforge.common.Tags;
 
 //import static com.brothers_trouble.postit.registration.RecipeRegistry.NOTE_COLORING_SERIALIZER;
+import static com.brothers_trouble.postit.registration.RecipeRegistry.NOTE_COLORING_SERIALIZER;
 import static com.brothers_trouble.postit.registration.RecipeRegistry.NOTE_COLORING_TYPE;
 
-public class NoteColoring extends ShulkerBoxColoring {
+public class NoteColoring extends CustomRecipe {
 
     public NoteColoring() {
         super(CraftingBookCategory.MISC);
         System.out.println("CONSTRUCTOR FOR PAGE CUTTING RUN");
     }
 
-    @Override
     public boolean matches(CraftingInput input, Level level) {
         int i = 0;
         int j = 0;
@@ -52,7 +52,6 @@ public class NoteColoring extends ShulkerBoxColoring {
         return i == 1 && j == 1;
     }
 
-    @Override
     public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
         ItemStack itemstack = ItemStack.EMPTY;
         DyeColor dyecolor = DyeColor.WHITE;
@@ -74,5 +73,25 @@ public class NoteColoring extends ShulkerBoxColoring {
 
         PostItItem.setDyeColor(itemstack, dyecolor);
         return itemstack.copyWithCount(4);
+    }
+
+    public boolean canCraftInDimensions(int width, int height) {
+        return width * height >= 2;
+    }
+
+    public RecipeSerializer<?> getSerializer() {
+        return NOTE_COLORING_SERIALIZER.get();
+    }
+
+    public static class Serializer implements RecipeSerializer<NoteColoring> {
+        @Override
+        public MapCodec<NoteColoring> codec() {
+            return MapCodec.unit(NoteColoring::new);
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, NoteColoring> streamCodec() {
+            return StreamCodec.unit(new NoteColoring());
+        }
     }
 }
