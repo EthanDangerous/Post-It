@@ -19,7 +19,7 @@ public class RecipeRegistry{
             TYPES.register("note_coloring", () -> new RecipeType<>() {
                 @Override
                 public String toString() {
-                    return "postit:note_coloring";
+                    return "note_coloring";
                 }
             });
 //                    () -> RecipeType.register("note_coloring"));
