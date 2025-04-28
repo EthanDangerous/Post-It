@@ -1,18 +1,3 @@
 {
-  "type": "postit:note_coloring",
-  "category": "misc",
-  "ingredients": [
-    {
-      "item": "minecraft:paper"
-    },
-    {
-      "item": "minecraft:shears"
-    },
-    {
-      "item": "minecraft:slime_ball"
-    }
-  ],
-  "result": {
-    "item": "postit:post_it_note"
-  }
+  "type": "postit:note_coloring"
 }
