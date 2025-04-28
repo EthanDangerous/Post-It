@@ -85,12 +85,12 @@ public class PostItScreen extends Screen {
 
         //this should create the text field and get the players clipboard?
         this.signField = new TextFieldHelper(() -> this.messages[this.line], this::setMessage, TextFieldHelper.createClipboardGetter(this.minecraft), TextFieldHelper.createClipboardSetter(this.minecraft), (p_280850_) -> this.minecraft.font.width(p_280850_) <= this.note.getMaxTextLineWidth());
-        this.line = 0;
-        this.setMessage("WORDS WORDS WORDS");
-        this.line = 1;
-        this.setMessage("WORDS2 WORDS2 WORDS2");
-        this.line = 2;
-        this.setMessage("WORDS3 WORDS3 WORDS3");
+//        this.line = 0;
+//        this.setMessage("WORDS WORDS WORDS");
+//        this.line = 1;
+//        this.setMessage("WORDS2 WORDS2 WORDS2");
+//        this.line = 2;
+//        this.setMessage("WORDS3 WORDS3 WORDS3");
     }
 
     //this is just for the blinking cursor

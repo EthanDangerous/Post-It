@@ -71,8 +71,9 @@ public class NoteColoring extends CustomRecipe {
             }
         }
 
-        PostItItem.setDyeColor(itemstack, dyecolor);
-        return itemstack.copyWithCount(4);
+        ItemStack returnItem = itemstack.copy();
+        PostItItem.setDyeColor(returnItem, dyecolor);
+        return returnItem.copyWithCount(1);
     }
 
     public boolean canCraftInDimensions(int width, int height) {
@@ -91,7 +92,12 @@ public class NoteColoring extends CustomRecipe {
 
         @Override
         public StreamCodec<RegistryFriendlyByteBuf, NoteColoring> streamCodec() {
-            return StreamCodec.unit(new NoteColoring());
+            return StreamCodec.of(
+                    // Writer - writes nothing as this recipe has no custom data
+                    (buf, recipe) -> {},
+                    // Reader - reads nothing but returns a new NoteColoring instance
+                    buf -> new NoteColoring()
+            );
         }
     }
 }
