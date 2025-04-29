@@ -24,13 +24,16 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import java.awt.*;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -38,7 +41,7 @@ import java.util.function.Consumer;
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Direction> DATA_HORIZ = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
-    public static final EntityDataAccessor<Component> DATA_COLOR = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.COMPONENT);
+    public static final EntityDataAccessor<Integer> DATA_COLOR = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
 //    public static final EntityDataAccessor<Component> TEXT_DATA = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.COMPONENT);
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int MAX_TEXT_LINE_WIDTH = 90;
@@ -62,6 +65,8 @@ public class PostItEntity extends Entity {
         if(facing != null){
             this.getEntityData().set(DATA_HORIZ, facing);
         }
+
+        this.getEntityData().set(DATA_COLOR, (int) DyedItemColor.getOrDefault(item, Color.GREEN.getRGB()));
         makeBoundingBox();
     }
 
