@@ -1,6 +1,7 @@
 package com.brothers_trouble.postit.entity.entity_render;
 
 import com.brothers_trouble.postit.PostIt;
+import com.brothers_trouble.postit.item.PostItItem;
 import com.brothers_trouble.postit.model.PostItModel;
 import com.brothers_trouble.postit.entity.PostItEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -95,7 +96,11 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(
                 buffer, this.model.renderType(this.getTextureLocation(entity)),false, false);
 
-        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
+        if(entity.noteItem == null){
+            this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
+        }else{
+            this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, PostItItem.getDyeColor(entity.noteItem));
+        }
 
         poseStack.popPose();
     }

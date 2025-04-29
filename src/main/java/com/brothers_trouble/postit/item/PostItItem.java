@@ -2,11 +2,7 @@ package com.brothers_trouble.postit.item;
 
 import com.brothers_trouble.postit.entity.PostItEntity;
 import com.brothers_trouble.postit.registration.EntityRegistry;
-import com.brothers_trouble.postit.registration.ItemRegistry;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -17,12 +13,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
-import java.util.List;
-import java.util.Objects;
 
 public class PostItItem extends Item{
     public static boolean used = false;
@@ -63,7 +56,6 @@ public class PostItItem extends Item{
             Vec3 vec3 = context.getClickLocation();
             Direction side = context.getClickedFace();
             PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side, facing, itemstack, player);
-//            System.out.println(level.isClientSide() + "<client side? : block face>" + side);
             postItEntity.setPos(vec3);
 
 

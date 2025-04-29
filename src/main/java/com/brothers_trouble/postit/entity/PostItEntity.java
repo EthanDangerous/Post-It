@@ -43,11 +43,10 @@ public class PostItEntity extends Entity {
     private static final int MAX_TEXT_LINE_WIDTH = 90;
     private static final int TEXT_LINE_HEIGHT = 10;
     private Component textComponent = null;
-    private ItemStack noteItem;
+    public ItemStack noteItem;
     private Player player;
     private Level level;
     private static SignText text;
-//    private PostItMenu menu;
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, Direction facing, ItemStack item, Player player) {
         super(entityType, level);
@@ -56,7 +55,6 @@ public class PostItEntity extends Entity {
         this.level = level;
         this.textComponent = item.get(ItemRegistry.NOTE);
         this.text = new SignText();
-//        this.menu = menu;
         if(face != null){
             this.getEntityData().set(DATA_SIDE, face.get3DDataValue());
         }
@@ -64,7 +62,6 @@ public class PostItEntity extends Entity {
             this.getEntityData().set(DATA_HORIZ, facing);
         }
         makeBoundingBox();
-//        System.out.println("EntityDataAccessor: " + this.getEntityData().get(DATA_SIDE));
     }
 
     public @NotNull InteractionResult interact(Player player, @NotNull InteractionHand hand){
@@ -115,16 +112,7 @@ public class PostItEntity extends Entity {
     }
 
     public void openScreen() {
-//        player.openMenu(new SimpleMenuProvider((MenuConstructor) menu, Component.translatable("Post it note")));
-//        player.openMenu(this);
-//        ServerPlayer player1 = (ServerPlayer) player;
-//        player1.openMenu(new SimpleMenuProvider(
-//                (containerId, playerInventory, player) -> new PostItMenu(containerId, playerInventory),
-//                Component.translatable("menu.title.examplemod.mymenu")
-//        ));
-//        ServerPlayer.openMenu(menuProvider, bytebuf -> {});
         if(Minecraft.getInstance() != null && level().isClientSide()){
-//            Minecraft.getInstance().setScreen(new PostItMenu(this.textComponent));
             Minecraft.getInstance().setScreen(new PostItScreen(this, this.text));
         }
     }
