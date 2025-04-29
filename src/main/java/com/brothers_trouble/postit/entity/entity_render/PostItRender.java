@@ -7,6 +7,7 @@ import com.brothers_trouble.postit.entity.PostItEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -93,14 +94,16 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
             }
         }
 
+
+
         VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(
                 buffer, this.model.renderType(this.getTextureLocation(entity)),false, false);
 
-        if(entity.noteItem == null){
-            this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
-        }else{
-            this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, PostItItem.getDyeColor(entity.noteItem));
-        }
+//        if(entity.noteItem == null){
+//            this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
+//        }else{
+            this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, entity.tags.getInt("color"));
+//        }
 
         poseStack.popPose();
     }

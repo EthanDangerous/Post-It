@@ -21,6 +21,7 @@ public class PostItItem extends Item{
     public static boolean used = false;
 
 
+
     public PostItItem(Properties properties) {
         super(properties
                 .component(DataComponents.DYED_COLOR, new DyedItemColor(0xFFFFFFFF, true))
@@ -37,7 +38,7 @@ public class PostItItem extends Item{
     }
 
     public static int getDyeColor(ItemStack stack) {
-        return DyedItemColor.getOrDefault(stack, Color.GREEN.getRGB());
+        return DyedItemColor.getOrDefault(stack, Color.WHITE.getRGB());
     }
 
     public static ItemStack getItemWithColor(ItemStack stack, DyeItem dye){

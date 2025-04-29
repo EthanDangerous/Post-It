@@ -5,12 +5,14 @@
 
 package com.brothers_trouble.postit.menu.screen;
 
+import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.entity.PostItEntity;
 import com.brothers_trouble.postit.menu.widget.CloseWidget;
 import com.mojang.blaze3d.platform.Lighting;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.font.TextFieldHelper;
@@ -18,18 +20,25 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 
-import static com.brothers_trouble.postit.menu.PostItMenu.BACKGROUND_TEXTURE;
+//import static com.brothers_trouble.postit.menu.PostItMenu.BACKGROUND_TEXTURE;
+import static net.minecraft.util.FastColor.ARGB32.*;
 
 @OnlyIn(Dist.CLIENT)
 public class PostItScreen extends Screen {
+    public static final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/example_container.png");
+    public static final TextureAtlas BACKGROUND_ATLAS = new TextureAtlas(BACKGROUND_TEXTURE);
+
     //this is the actual entity you are clicking
     private final PostItEntity note;
 
@@ -142,7 +151,13 @@ public class PostItScreen extends Screen {
 //        this.renderTransparentBackground(guiGraphics);
         this.renderBlurredBackground(partialTick);
         this.renderMenuBackground(guiGraphics);
+        float r = red(note.getColor());
+        float g = green(note.getColor());
+        float b = blue(note.getColor());
+
+        RenderSystem.setShaderColor(r/255, g/255, b/255, 1.0F);
         guiGraphics.blit(BACKGROUND_TEXTURE, (this.width - 160)/2, (this.height - 160)/2, 0, 0, 160, 160);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     public void onClose() {

@@ -51,6 +51,7 @@ public class PostItEntity extends Entity {
     private Player player;
     private Level level;
     private static SignText text;
+    public static CompoundTag tags = new CompoundTag();
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, Direction facing, ItemStack item, Player player) {
         super(entityType, level);
@@ -66,7 +67,8 @@ public class PostItEntity extends Entity {
             this.getEntityData().set(DATA_HORIZ, facing);
         }
 
-        this.getEntityData().set(DATA_COLOR, (int) DyedItemColor.getOrDefault(item, Color.GREEN.getRGB()));
+        this.getEntityData().set(DATA_COLOR, DyedItemColor.getOrDefault(item, Color.WHITE.getRGB()));
+        tags.putInt("color", getColor());
         makeBoundingBox();
     }
 
@@ -84,6 +86,8 @@ public class PostItEntity extends Entity {
             return InteractionResult.SUCCESS;
         }
     }
+
+    // override the pick() method to show the text when the entity is hovered over
 
     public SignText getText(){
         return this.text;
@@ -148,6 +152,10 @@ public class PostItEntity extends Entity {
         return Direction.from3DDataValue(this.getEntityData().get(DATA_SIDE));
     }
 
+    public int getColor(){
+        return this.getEntityData().get(DATA_COLOR);
+    }
+
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level) {
         super(entityType, level);
         this.makeBoundingBox();
@@ -162,6 +170,7 @@ public class PostItEntity extends Entity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_SIDE, 0);
         builder.define(DATA_HORIZ, Direction.NORTH);
+        builder.define(DATA_COLOR, 0);
 //        builder.define(TEXT_DATA, textComponent);
     }
 
@@ -177,29 +186,29 @@ public class PostItEntity extends Entity {
         compoundTag.putInt("Rotation", this.getEntityData().get(DATA_SIDE));
     }
 
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-//        super.addAdditionalSaveData(tag);
-        DynamicOps<Tag> dynamicops = registries.createSerializationContext(NbtOps.INSTANCE);
-        DataResult var10000 = SignText.DIRECT_CODEC.encodeStart(dynamicops, this.text);
-        Logger var10001 = LOGGER;
-        Objects.requireNonNull(var10001);
-        var10000.resultOrPartial((Consumer<String>) var10001).ifPresent((p_277417_) -> {
-            tag.put("text", (Tag) p_277417_);
-        });
-    }
-
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-//        super.readAdditionalSaveData(tag);
-        DynamicOps<Tag> dynamicops = registries.createSerializationContext(NbtOps.INSTANCE);
-        DataResult var10000;
-        Logger var10001;
-        var10000 = SignText.DIRECT_CODEC.parse(dynamicops, tag.getCompound("front_text"));
-        var10001 = LOGGER;
-        Objects.requireNonNull(var10001);
-        var10000.resultOrPartial((Consumer<String>) var10001).ifPresent((p_278212_) -> {
-            this.text = this.loadLines((SignText) p_278212_);
-        });
-    }
+//    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+////        super.addAdditionalSaveData(tag);
+//        DynamicOps<Tag> dynamicops = registries.createSerializationContext(NbtOps.INSTANCE);
+//        DataResult var10000 = SignText.DIRECT_CODEC.encodeStart(dynamicops, this.text);
+//        Logger var10001 = LOGGER;
+//        Objects.requireNonNull(var10001);
+//        var10000.resultOrPartial((Consumer<String>) var10001).ifPresent((p_277417_) -> {
+//            tag.put("text", (Tag) p_277417_);
+//        });
+//    }
+//
+//    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+////        super.readAdditionalSaveData(tag);
+//        DynamicOps<Tag> dynamicops = registries.createSerializationContext(NbtOps.INSTANCE);
+//        DataResult var10000;
+//        Logger var10001;
+//        var10000 = SignText.DIRECT_CODEC.parse(dynamicops, tag.getCompound("front_text"));
+//        var10001 = LOGGER;
+//        Objects.requireNonNull(var10001);
+//        var10000.resultOrPartial((Consumer<String>) var10001).ifPresent((p_278212_) -> {
+//            this.text = this.loadLines((SignText) p_278212_);
+//        });
+//    }
 
     private SignText loadLines(SignText text) {
         for(int i = 0; i < 4; ++i) {
