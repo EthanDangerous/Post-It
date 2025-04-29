@@ -38,6 +38,7 @@ import java.util.function.Consumer;
 public class PostItEntity extends Entity {
     public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Direction> DATA_HORIZ = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
+    public static final EntityDataAccessor<Component> DATA_COLOR = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.COMPONENT);
 //    public static final EntityDataAccessor<Component> TEXT_DATA = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.COMPONENT);
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int MAX_TEXT_LINE_WIDTH = 90;
