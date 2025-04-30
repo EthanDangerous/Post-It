@@ -30,11 +30,11 @@ public class PostItItem extends Item{
     }
 
     public static void setDyeColor(ItemStack stack, DyeItem dyeItem) {
-        stack.set(DataComponents.DYED_COLOR, new DyedItemColor(dyeItem.getDyeColor().getTextColor(), false));
+        stack.set(DataComponents.DYED_COLOR, new DyedItemColor(dyeItem.getDyeColor().getTextColor(), true));
     }
 
     public static void setDyeColor(ItemStack stack, DyeColor dyeColor) {
-        stack.set(DataComponents.DYED_COLOR, new DyedItemColor(dyeColor.getTextColor(), false));
+        stack.set(DataComponents.DYED_COLOR, new DyedItemColor(dyeColor.getTextColor(), true));
     }
 
     public static int getDyeColor(ItemStack stack) {

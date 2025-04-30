@@ -94,16 +94,10 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
             }
         }
 
-
-
         VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(
                 buffer, this.model.renderType(this.getTextureLocation(entity)),false, false);
 
-//        if(entity.noteItem == null){
-//            this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
-//        }else{
-            this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, entity.tags.getInt("color"));
-//        }
+        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, entity.tags.getInt("color"));
 
         poseStack.popPose();
     }
