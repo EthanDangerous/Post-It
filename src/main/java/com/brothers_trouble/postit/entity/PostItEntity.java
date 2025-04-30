@@ -51,7 +51,8 @@ public class PostItEntity extends Entity {
     private Player player;
     private Level level;
     private static SignText text;
-    public static CompoundTag tags = new CompoundTag();
+    public CompoundTag tags = new CompoundTag();
+    public int colorInt = 0;
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, Direction facing, ItemStack item, Player player) {
         super(entityType, level);
@@ -68,6 +69,7 @@ public class PostItEntity extends Entity {
         }
 
         this.getEntityData().set(DATA_COLOR, DyedItemColor.getOrDefault(item, Color.WHITE.getRGB()));
+        colorInt = getColor();
         tags.putInt("color", getColor());
         makeBoundingBox();
     }
@@ -87,10 +89,13 @@ public class PostItEntity extends Entity {
         }
     }
 
-    // override the pick() method to show the text when the entity is hovered over
-
     public SignText getText(){
         return this.text;
+    }
+
+    public int getTagColor(){
+        return colorInt;
+//        return tags.getInt("color");
     }
 
     public int getMaxTextLineWidth() {

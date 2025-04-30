@@ -18,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import static com.brothers_trouble.postit.entity.PostItEntity.DATA_COLOR;
 import static com.brothers_trouble.postit.entity.PostItEntity.DATA_HORIZ;
 
 public class PostItRender extends EntityRenderer<PostItEntity> {
@@ -97,7 +98,7 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(
                 buffer, this.model.renderType(this.getTextureLocation(entity)),false, false);
 
-        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, entity.tags.getInt("color"));
+        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, entity.getEntityData().get(DATA_COLOR));
 
         poseStack.popPose();
     }
