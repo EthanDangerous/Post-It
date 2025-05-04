@@ -103,7 +103,7 @@ public class PostIt
         @SubscribeEvent
         public static void onRegisterItemColorHandlers(RegisterColorHandlersEvent.Item event){
             event.register((stack, tintIndex) -> {
-                return DyedItemColor.getOrDefault(stack, 0xFFFFFFFF);
+                return DyedItemColor.getOrDefault(stack, PostItItem.DEFAULT_COLOR);
 //                if(tintInt == 0){
 ////                    return Color.HSBtoRGB(0.5F, 0.5F, 1F);
 //                    return Color.GREEN.getRGB();

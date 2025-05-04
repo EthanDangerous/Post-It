@@ -18,9 +18,10 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 public class PostItItem extends Item{
+    public static int DEFAULT_COLOR = 0xFFFFFFFF;
     public PostItItem(Properties properties) {
         super(properties
-                .component(DataComponents.DYED_COLOR, new DyedItemColor(0xFFFFFFFF, true))
+                .component(DataComponents.DYED_COLOR, new DyedItemColor(DEFAULT_COLOR, true))
                         .component(ItemRegistry.NOTE_TEXT_COMPONENT, new SignText())
         );
     }
