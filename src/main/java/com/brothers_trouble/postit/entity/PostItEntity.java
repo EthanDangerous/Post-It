@@ -1,169 +1,184 @@
 package com.brothers_trouble.postit.entity;
 
-import com.brothers_trouble.postit.menu.screen.PostItScreen;
+import com.brothers_trouble.postit.PostIt;
+import com.brothers_trouble.postit.menu.screen.NoteScreen;
+import com.brothers_trouble.postit.registration.EntityRegistry;
 import com.brothers_trouble.postit.registration.ItemRegistry;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.logging.LogUtils;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.Codec;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
-import java.awt.*;
 import java.util.Objects;
-import java.util.UUID;
-import java.util.function.Consumer;
 
 public class PostItEntity extends Entity {
-    public static final EntityDataAccessor<Integer> DATA_SIDE = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
-    public static final EntityDataAccessor<Direction> DATA_HORIZ = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
-    public static final EntityDataAccessor<Integer> DATA_COLOR = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
-//    public static final EntityDataAccessor<Component> TEXT_DATA = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.COMPONENT);
-    private static final Logger LOGGER = LogUtils.getLogger();
+    protected static final EntityDataAccessor<Direction> FACE_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
+    protected static final EntityDataAccessor<Direction> HORI_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
+
+    protected static final EntityDataAccessor<Integer> NOTE_COLOR = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);
+    protected static final EntityDataAccessor<SignText> NOTE_TEXT = SynchedEntityData.defineId(PostItEntity.class, EntityRegistry.NOTE_TEXT_DATA_SERIALIZER);
+
+    protected final ItemStack stack;
     private static final int MAX_TEXT_LINE_WIDTH = 90;
     private static final int TEXT_LINE_HEIGHT = 10;
-    private Component textComponent = null;
-    public ItemStack noteItem;
-    private Player player;
-    private Level level;
-    private static SignText text;
-    public CompoundTag tags = new CompoundTag();
-    public int colorInt = 0;
 
-    public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, Direction face, Direction facing, ItemStack item, Player player) {
+    public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level) {
+        this(entityType, level, Direction.UP, Direction.NORTH, new ItemStack(ItemRegistry.POST_IT_NOTE));
+    }
+
+    public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level, @NotNull Direction faceDirection, @NotNull Direction horiDirection, @NotNull ItemStack stack) {
         super(entityType, level);
-        this.noteItem = item;
-        this.player = player;
-        this.level = level;
-        this.textComponent = item.get(ItemRegistry.NOTE);
-        this.text = new SignText();
-        if(face != null){
-            this.getEntityData().set(DATA_SIDE, face.get3DDataValue());
-        }
-        if(facing != null){
-            this.getEntityData().set(DATA_HORIZ, facing);
-        }
+        assert(stack.is(ItemRegistry.POST_IT_NOTE.get()));
 
-        this.getEntityData().set(DATA_COLOR, DyedItemColor.getOrDefault(item, Color.WHITE.getRGB()));
-        colorInt = getColor();
-        tags.putInt("color", getColor());
-        makeBoundingBox();
-    }
+        this.stack = stack.copyWithCount(1);
 
-    public @NotNull InteractionResult interact(Player player, @NotNull InteractionHand hand){
-        if(player.isShiftKeyDown()){
-            System.out.println("Interaction 1");
-//            player.addItem(noteItem);
-            this.kill();
-            return InteractionResult.SUCCESS;
-        }else{
-            System.out.println("Interaction 2");
-            if(Minecraft.getInstance() != null){
-                openScreen();
-            }
-            return InteractionResult.SUCCESS;
-        }
-    }
+        SignText text = this.stack.getOrDefault(ItemRegistry.NOTE_TEXT_COMPONENT, new SignText());
+        int color     = DyedItemColor.getOrDefault(this.stack,  0xFFFFFFFF);
 
-    public SignText getText(){
-        return this.text;
-    }
-
-    public int getTagColor(){
-        return colorInt;
-//        return tags.getInt("color");
-    }
-
-    public int getMaxTextLineWidth() {
-        return 120;
-    }
-
-    public int getTextLineHeight() {
-        return 12;
-    }
-
-    public boolean playerIsTooFarAwayToEdit(UUID uuid) {
-        Player player = this.level.getPlayerByUUID(uuid);
-        return player == null || !player.canInteractWithBlock(this.getBlockPos(), 4.0);
-    }
-
-    public BlockPos getBlockPos(){
-        return this.getOnPos();
-    }
-
-    public boolean setText(SignText text) {
-        this.text = text;
-        this.markUpdated();
-        return true;
-    }
-
-    private void markUpdated() {
-//        this.setChanged();
-//        this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 3);
-    }
-
-    public void openScreen() {
-        if(Minecraft.getInstance() != null && level().isClientSide()){
-            Minecraft.getInstance().setScreen(new PostItScreen(this, this.text));
-        }
+        setText(text);
+        setColor(color);
+        setHoriDirection(horiDirection);
+        setFaceDirection(faceDirection, true);
     }
 
     @Override
-    protected @NotNull AABB makeBoundingBox() {
-        float thickness = 0.05f;
-        float length = 0.25f;
-        float offset = thickness/2;
-        if(getSide() == Direction.UP){
-            return AABB.ofSize(position().add(0, offset, 0), length, thickness, length);
-        }else if(getSide() == Direction.DOWN){
-            return AABB.ofSize(position().subtract(0, offset, 0), length, thickness, length);
-        }else if(getSide() == Direction.NORTH){
-            return AABB.ofSize(position().subtract(0, 0, offset), length, length, thickness);
-        }else if(getSide() == Direction.EAST){
-            return AABB.ofSize(position().add(offset, 0, 0), thickness, length, length);
-        }else if(getSide() == Direction.SOUTH){
-            return AABB.ofSize(position().add(0, 0, offset), length, length, thickness);
-        }else if(getSide() == Direction.WEST){
-            return AABB.ofSize(position().subtract(offset, 0.0, 0), thickness, length, length);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(FACE_DIRECTION, Direction.UP);
+        builder.define(HORI_DIRECTION, Direction.NORTH);
+        builder.define(NOTE_COLOR, 0xFFFFFFFF);
+        builder.define(NOTE_TEXT, new SignText());
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> dataAccessor) {
+        if (dataAccessor == FACE_DIRECTION) rotateToFace(face());
+
+        super.onSyncedDataUpdated(dataAccessor);
+    }
+
+    protected void rotateToFace(@NotNull Direction faceDirection) {
+        if (faceDirection.getAxis().isHorizontal()) {
+            this.setXRot(0.0F);
+            this.setYRot(faceDirection.get2DDataValue() * 90);
+        } else {
+            this.setXRot(-90 * faceDirection.getAxisDirection().getStep());
+            this.setYRot(0.0F);
         }
-        return AABB.ofSize(position(), 1.0f, 1.0f, 1.0f);
+
+        this.xRotO = this.getXRot();
+        this.yRotO = this.getYRot();
+        this.recalculateBoundingBox(faceDirection);
     }
 
-    public Direction getSide() {
-        return Direction.from3DDataValue(this.getEntityData().get(DATA_SIDE));
+    protected final void recalculateBoundingBox(Direction faceDirection) {
+        AABB aABB = this.calculateBoundingBox(faceDirection);
+        Vec3 vec3 = aABB.getCenter();
+        this.setPosRaw(vec3.x, vec3.y, vec3.z);
+        this.setBoundingBox(aABB);
     }
 
-    public int getColor(){
-        return this.getEntityData().get(DATA_COLOR);
+    protected AABB calculateBoundingBox(Direction direction) {
+        float thickness = 0.05f;
+        float length    = 0.25f;
+
+        Vec3i normal = direction.getNormal();
+        Vec3  offset = new Vec3(normal.getX(), normal.getY(), normal.getZ()).scale(thickness / 2);
+
+        Direction.Axis axis = direction.getAxis();
+        double x = axis == Direction.Axis.X ? thickness : length;
+        double y = axis == Direction.Axis.Y ? thickness : length;
+        double z = axis == Direction.Axis.Z ? thickness : length;
+        return AABB.ofSize(position().add(offset), x, y, z);
     }
 
-    public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level) {
-        super(entityType, level);
-        this.makeBoundingBox();
+    public void setFaceDirection(@NotNull Direction faceDirection, boolean forceUpdate) {
+        Objects.requireNonNull(faceDirection);
+        this.entityData.set(FACE_DIRECTION, faceDirection, forceUpdate);
+    }
+
+    public void setHoriDirection(@NotNull Direction horiDirection) {
+        Objects.requireNonNull(horiDirection);
+        this.entityData.set(HORI_DIRECTION, horiDirection);
+    }
+
+    public void setText(@NotNull SignText text) {
+        Objects.requireNonNull(text);
+        this.entityData.set(NOTE_TEXT, text);
+    }
+
+    public void setColor(int color) {
+        this.entityData.set(NOTE_COLOR, color);
+    }
+
+    public @NotNull Direction face() {
+        return Objects.requireNonNull(this.entityData.get(FACE_DIRECTION));
+    }
+
+    public @NotNull Direction hori() {
+        return Objects.requireNonNull(this.entityData.get(HORI_DIRECTION));
+    }
+
+    public @NotNull SignText text() {
+        return Objects.requireNonNull(this.entityData.get(NOTE_TEXT));
+    }
+
+    public int color() {
+        return Objects.requireNonNull(this.entityData.get(NOTE_COLOR));
+    }
+
+    @Override
+    public @NotNull InteractionResult interact(Player player, InteractionHand hand) {
+        if (player.isShiftKeyDown()) {
+            PostIt.LOGGER.info("Interaction 1");
+            if (player.level().isClientSide()) return InteractionResult.PASS;
+
+            player.getInventory().placeItemBackInInventory(getPickupStack());
+            remove(RemovalReason.DISCARDED);
+        } else {
+            PostIt.LOGGER.info("Interaction 2");
+            if (player.level().isClientSide()) openScreen();
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    public ItemStack getPickupStack() {
+        ItemStack stack = this.stack;
+
+        stack.set(DataComponents.DYED_COLOR, new DyedItemColor(color(), true));
+        stack.set(ItemRegistry.NOTE_TEXT_COMPONENT, text());
+
+        return stack;
+    }
+
+    protected void openScreen() {
+        Minecraft.getInstance().setScreen(new NoteScreen(this, false));
+    }
+
+    public int getMaxTextLineWidth() {
+        return MAX_TEXT_LINE_WIDTH;
+    }
+
+    public int getTextLineHeight() {
+        return TEXT_LINE_HEIGHT;
     }
 
     @Override
@@ -172,73 +187,39 @@ public class PostItEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(DATA_SIDE, 0);
-        builder.define(DATA_HORIZ, Direction.NORTH);
-        builder.define(DATA_COLOR, 0);
-//        builder.define(TEXT_DATA, textComponent);
+    public boolean hurt(@NotNull DamageSource source, float amount) {
+        return false;
+    }
+
+    // copied from mojank serialization slop, don't blame me
+    @Override
+    protected void readAdditionalSaveData(CompoundTag tag) {
+        if (tag.contains("NoteColor")) setColor(tag.getInt("NoteColor"));
+
+        if (tag.contains("NoteText"))
+            SignText.DIRECT_CODEC
+                    .parse(NbtOps.INSTANCE, tag.getCompound("NoteText"))
+                    .resultOrPartial(PostIt.LOGGER::error)
+                    .ifPresent(this::setText);
+
+        if (tag.contains("HorizontalDirection"))
+            setHoriDirection(Direction.from2DDataValue(tag.getByte("HorizontalDirection")));
+
+        if (tag.contains("FacingDirection"))
+            setFaceDirection(Direction.from3DDataValue(tag.getByte("FacingDirection")), true);
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compoundTag) {
-        if (compoundTag.contains("Rotation")) {
-            this.getEntityData().set(DATA_SIDE, compoundTag.getInt("Rotation"));
-        }
+    protected void addAdditionalSaveData(CompoundTag tag) {
+
+        tag.putInt("NoteColor", color());
+
+        SignText.DIRECT_CODEC
+                .encodeStart(NbtOps.INSTANCE, text())
+                .resultOrPartial(PostIt.LOGGER::error)
+                .ifPresent(t -> tag.put("NoteText", t));
+
+        tag.putByte("HorizontalDirection", (byte) hori().get2DDataValue());
+        tag.putByte("FacingDirection",     (byte) face().get3DDataValue());
     }
-
-    @Override
-    protected void addAdditionalSaveData(CompoundTag compoundTag) {
-        compoundTag.putInt("Rotation", this.getEntityData().get(DATA_SIDE));
-    }
-
-//    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-////        super.addAdditionalSaveData(tag);
-//        DynamicOps<Tag> dynamicops = registries.createSerializationContext(NbtOps.INSTANCE);
-//        DataResult var10000 = SignText.DIRECT_CODEC.encodeStart(dynamicops, this.text);
-//        Logger var10001 = LOGGER;
-//        Objects.requireNonNull(var10001);
-//        var10000.resultOrPartial((Consumer<String>) var10001).ifPresent((p_277417_) -> {
-//            tag.put("text", (Tag) p_277417_);
-//        });
-//    }
-//
-//    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-////        super.readAdditionalSaveData(tag);
-//        DynamicOps<Tag> dynamicops = registries.createSerializationContext(NbtOps.INSTANCE);
-//        DataResult var10000;
-//        Logger var10001;
-//        var10000 = SignText.DIRECT_CODEC.parse(dynamicops, tag.getCompound("front_text"));
-//        var10001 = LOGGER;
-//        Objects.requireNonNull(var10001);
-//        var10000.resultOrPartial((Consumer<String>) var10001).ifPresent((p_278212_) -> {
-//            this.text = this.loadLines((SignText) p_278212_);
-//        });
-//    }
-
-    private SignText loadLines(SignText text) {
-        for(int i = 0; i < 4; ++i) {
-            Component component = this.loadLine(text.getMessage(i, false));
-            Component component1 = this.loadLine(text.getMessage(i, true));
-            text = text.setMessage(i, component, component1);
-        }
-
-        return text;
-    }
-
-    private Component loadLine(Component lineText) {
-        Level var3 = this.level;
-        if (var3 instanceof ServerLevel serverlevel) {
-            try {
-                return ComponentUtils.updateForEntity(createCommandSourceStack(), lineText, (Entity)null, 0);
-            } catch (CommandSyntaxException var4) {
-            }
-        }
-
-        return lineText;
-    }
-
-//    @Override
-//    public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-//        return new PostItMenu(i, inventory, this);
-//    }
 }
