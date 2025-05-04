@@ -18,8 +18,6 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 public class EntityRegistry {
-    public static final StreamCodec<ByteBuf, SignText> NOTE_TEXT_STREAM_CODEC = ByteBufCodecs.fromCodec(SignText.DIRECT_CODEC);
-
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, PostIt.MODID);
 
@@ -35,7 +33,7 @@ public class EntityRegistry {
     public static final EntityDataSerializer<SignText> NOTE_TEXT_DATA_SERIALIZER =  new EntityDataSerializer<>() {
         @Override
         public @NotNull StreamCodec<? super RegistryFriendlyByteBuf, SignText> codec() {
-            return NOTE_TEXT_STREAM_CODEC;
+            return PacketRegistry.NOTE_TEXT_STREAM_CODEC;
         }
 
         public @NotNull SignText copy(@NotNull SignText text) {

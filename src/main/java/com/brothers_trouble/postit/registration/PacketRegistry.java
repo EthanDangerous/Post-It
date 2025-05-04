@@ -2,8 +2,10 @@ package com.brothers_trouble.postit.registration;
 
 import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.entity.PostItEntity;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
@@ -17,9 +19,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public class PacketRegistry {
+	public static final StreamCodec<ByteBuf, SignText> NOTE_TEXT_STREAM_CODEC = ByteBufCodecs.fromCodec(SignText.DIRECT_CODEC);
+
 	public record UpdateNoteTextPacket(UUID noteId, SignText text) implements CustomPacketPayload {
 		public static final Type<UpdateNoteTextPacket> TYPE = new Type<>(PostIt.locate("update_note_text"));
-		public static final StreamCodec<FriendlyByteBuf, UpdateNoteTextPacket> CODEC = StreamCodec.composite(UUIDUtil.STREAM_CODEC, UpdateNoteTextPacket::noteId, EntityRegistry.NOTE_TEXT_STREAM_CODEC, UpdateNoteTextPacket::text, UpdateNoteTextPacket::new);
+		public static final StreamCodec<FriendlyByteBuf, UpdateNoteTextPacket> CODEC = StreamCodec.composite(UUIDUtil.STREAM_CODEC, UpdateNoteTextPacket::noteId, PacketRegistry.NOTE_TEXT_STREAM_CODEC, UpdateNoteTextPacket::text, UpdateNoteTextPacket::new);
 
 		@Override
 		public @NotNull Type<UpdateNoteTextPacket> type() {

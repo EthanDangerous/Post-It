@@ -25,7 +25,7 @@ public class ItemRegistry {
             () -> new PostItItem(new Item.Properties()));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<SignText>> NOTE_TEXT_COMPONENT = COMPONENTS.register("note_text",
-            () -> DataComponentType.<SignText>builder().persistent(SignText.DIRECT_CODEC).networkSynchronized(EntityRegistry.NOTE_TEXT_STREAM_CODEC).build());
+            () -> DataComponentType.<SignText>builder().persistent(SignText.DIRECT_CODEC).networkSynchronized(PacketRegistry.NOTE_TEXT_STREAM_CODEC).build());
 
     public static void register(IEventBus eventBus){
         CommonHooks.markComponentClassAsValid(SignText.class);
