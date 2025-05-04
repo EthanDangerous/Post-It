@@ -2,10 +2,8 @@ package com.brothers_trouble.postit.registration;
 
 import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.entity.PostItEntity;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.world.entity.EntityType;
