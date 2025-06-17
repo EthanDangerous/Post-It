@@ -1,5 +1,6 @@
 package com.brothers_trouble.postit.menu.screen;
 
+import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.entity.PostItEntity;
 import com.brothers_trouble.postit.model.PostItModel;
 import com.brothers_trouble.postit.registration.PacketRegistry;
@@ -12,6 +13,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.SignText;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -32,6 +34,8 @@ public class NoteScreen extends Screen {
 	private int line;
 	@Nullable
 	private TextFieldHelper signField;
+
+    private ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/example_container.png");
 
 	public NoteScreen(PostItEntity note, boolean isFiltered) {
 		this(note, isFiltered, Component.translatable("note.postit.edit"));
@@ -142,6 +146,7 @@ public class NoteScreen extends Screen {
 		this.offsetSign(guiGraphics);
 		guiGraphics.pose().pushPose();
 		// TODO: render background here
+		guiGraphics.blit(BACKGROUND_TEXTURE, width/2, height/2, 0, 0, 160, 160);
 		guiGraphics.pose().popPose();
 		this.renderSignText(guiGraphics);
 		guiGraphics.pose().popPose();
