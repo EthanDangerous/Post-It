@@ -130,10 +130,12 @@ public class PostItEntity extends Entity {
     }
 
     public @NotNull Direction face() {
+        //FACE OF BLOCK
         return Objects.requireNonNull(this.entityData.get(FACE_DIRECTION));
     }
 
     public @NotNull Direction hori() {
+        //DIRECTION OF PLACEMENT
         return Objects.requireNonNull(this.entityData.get(HORI_DIRECTION));
     }
 

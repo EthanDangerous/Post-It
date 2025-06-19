@@ -47,25 +47,65 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
 
     @Override
     public void render(PostItEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        poseStack.pushPose();
+//        poseStack.pushPose();
 
         var faceDir = entity.face();
-        var horiDir = entity.face();
+        var horiDir = entity.hori();
 
-        poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
+        // Render model first
+        poseStack.pushPose();
+        poseStack.mulPose(calculateQuaternionRotationForSign(faceDir, horiDir));
+        if(horiDir.equals(Direction.NORTH) || horiDir.equals(Direction.SOUTH)){
+            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
+        }
 
         VertexConsumer modelCons = bufferSource.getBuffer(this.model.renderType(TEXTURE_LOCATION));
         this.model.renderToBuffer(poseStack, modelCons, packedLight, OverlayTexture.NO_OVERLAY, entity.color());
-
         poseStack.popPose();
-        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
 
-        renderSignText(entity.getOnPos(), entity.text(), poseStack, bufferSource, packedLight, 10, entity.getMaxTextLineWidth(), true);
+        // Then render text with proper transformations
+        poseStack.pushPose();
+//        poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
+        renderSignText(entity, entity.getOnPos(), entity.text(), poseStack, bufferSource, packedLight, 10, entity.getMaxTextLineWidth(), true);
+        poseStack.popPose();
     }
 
-    void renderSignText(BlockPos pos, SignText text, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int lineHeight, int maxWidth, boolean isFrontText) {
-        PostIt.LOGGER.debug("TRYING TO RENDER THE TEXT ON MODEL");
+    void renderSignText(PostItEntity entity, BlockPos pos, SignText text, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int lineHeight, int maxWidth, boolean isFrontText) {
         poseStack.pushPose();
+
+        // Apply the same rotation as the PostIt note
+        var faceDir = entity.face();
+        var horiDir = entity.hori(); // You might want to use actual horizontal direction
+        poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
+//        if(!faceDir.equals(Direction.UP) && !faceDir.equals(Direction.DOWN)){
+//            poseStack.mulPose(Axis.YP.rotationDegrees(horiDir.toYRot())); // 90 degrees on Y axis
+//        }
+//        if(horiDir.equals(Direction.NORTH)){
+//            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F)); // 90 degrees on Y axis
+//            poseStack.mulPose(Axis.ZN.rotationDegrees(90.0F)); // 90 degrees on Z axis
+//            poseStack.mulPose(Axis.XP.rotationDegrees(90.0F)); // 90 degrees on Y axis
+//        }else if(horiDir.equals(Direction.EAST)){
+//            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F)); // 90 degrees on Y axis
+//            poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F)); // 90 degrees on Z axis
+//            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F)); // 90 degrees on Y axis
+//        }else if(horiDir.equals(Direction.SOUTH)){
+//            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F)); // 90 degrees on Y axis
+//            poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F)); // 90 degrees on Z axis
+//            poseStack.mulPose(Axis.XP.rotationDegrees(90.0F)); // 90 degrees on Y axis
+//        }else if(horiDir.equals(Direction.WEST)){
+//            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F)); // 90 degrees on Y axis
+//            poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F)); // 90 degrees on Z axis
+//            poseStack.mulPose(Axis.XP.rotationDegrees(0.0F)); // 90 degrees on Y axis
+//        }else{
+//            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F)); // 90 degrees on Y axis
+//            poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F)); // 90 degrees on Z axis
+//            poseStack.mulPose(Axis.XP.rotationDegrees(90.0F)); // 90 degrees on Y axis
+//        }
+
+        poseStack.translate(0, -0.086, 0.001); // Adjust the -0.1 value as needed
+        poseStack.scale(0.25f, 0.25f, 0.25f);
+
+
         this.translateSignText(poseStack, isFrontText, this.getTextOffset());
         int i = getDarkColor(text);
         int j = 4 * lineHeight / 2;
@@ -137,14 +177,38 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         return TEXTURE_LOCATION;
     }
 
+//    public static Quaternionf calculateQuaternionRotation(Direction face, Direction hori) {
+//        if (face.getAxis().isHorizontal()) {
+//            float rot = face.toYRot();
+//            return Axis.YP.rotationDegrees(90+rot)
+//                    .mul(Axis.ZP.rotationDegrees(90+2*rot))
+//                    .mul(Axis.YP.rotationDegrees(180+2*rot));
+//        } else{
+//            return Axis.ZP.rotationDegrees(180*(face.get3DDataValue()-1))
+//                    .mul(Axis.YP.rotationDegrees(90-hori.toYRot()));
+//        }
+//    }
     public static Quaternionf calculateQuaternionRotation(Direction face, Direction hori) {
-        if (face.getAxis().isHorizontal()) {
-            float rot = face.toYRot();
-            return Axis.YP.rotationDegrees(90+rot)
-                    .mul(Axis.ZP.rotationDegrees(90+2*rot))
-                    .mul(Axis.YP.rotationDegrees(180+2*rot));
-        } else
-            return Axis.ZP.rotationDegrees(180*(face.get3DDataValue()-1))
-                    .mul(Axis.YP.rotationDegrees(90-hori.toYRot()));
+        return face.getAxis().isHorizontal()
+                ? Axis.YP.rotationDegrees(-face.toYRot())
+                : Axis.XP.rotationDegrees(90*(1 - 2*face.get3DDataValue()))
+                .mul(Axis.ZP.rotationDegrees(3*hori.toYRot() + 180));
+    }
+
+    public static Quaternionf calculateQuaternionRotationForSign(Direction face, Direction hori) {
+        // optimized version of the horizontal case:
+        //private static final double QUAT_SCALE = Math.sqrt(0.5);
+        //final double angle = (face.toYRot()/120-0.25) * Math.PI;
+        //final double sin = Math.sin(angle);
+        //final double cos = Math.cosFromSin(sin, angle);
+        //dest.set((float) (-sin * QUAT_SCALE),
+        //		 (float) ( sin * QUAT_SCALE),
+        //		 (float) (-cos * QUAT_SCALE),
+        //		 (float) ( cos * QUAT_SCALE));
+
+        return face.getAxis().isHorizontal()
+                ? Axis.YP.rotationDegrees(3*face.toYRot() - 90).mul(Axis.ZP.rotationDegrees(-90))
+                : Axis.ZP.rotationDegrees(180*(face.get3DDataValue() - 1))
+                .mul(Axis.YP.rotationDegrees(hori.toYRot() - 90));
     }
 }
