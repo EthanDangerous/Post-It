@@ -1,0 +1,30 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.post_it_note",
+				"texture_width": 16,
+				"texture_height": 16,
+				"visible_bounds_width": 1,
+				"visible_bounds_height": 1,
+				"visible_bounds_offset": [0, 0, 0]
+			},
+			"bones": [
+				{
+					"name": "bone",
+					"pivot": [8, 0, -8],
+					"texture_meshes": [
+						{
+							"texture": "postit:textures/entity/post_it",
+							"position": [0, 0, 0],
+							"rotation": [-90, -180, 0],
+							"local_pivot": [0, -7.5, 16],
+							"scale": [4, 10, 5]
+						}
+					]
+				}
+			]
+		}
+	]
+}

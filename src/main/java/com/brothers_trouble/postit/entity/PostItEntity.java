@@ -27,10 +27,14 @@ import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.*;
+import software.bernie.geckolib.animatable.instance.*;
+import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.util.*;
 
 import java.util.Objects;
 
-public class PostItEntity extends Entity {
+public class PostItEntity extends Entity implements GeoEntity {
     protected static final EntityDataAccessor<Direction> FACE_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
     protected static final EntityDataAccessor<Direction> HORI_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
 
@@ -40,6 +44,8 @@ public class PostItEntity extends Entity {
     protected final ItemStack stack;
     private static final int MAX_TEXT_LINE_WIDTH = 90;
     private static final int TEXT_LINE_HEIGHT = 10;
+    
+    private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level) {
         this(entityType, level, Direction.UP, Direction.NORTH, new ItemStack(ItemRegistry.POST_IT_NOTE));
@@ -224,4 +230,19 @@ public class PostItEntity extends Entity {
         tag.putByte("HorizontalDirection", (byte) hori().get2DDataValue());
         tag.putByte("FacingDirection",     (byte) face().get3DDataValue());
     }
+    
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.geoCache;
+    }
+    
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        //controllers.add(new AnimationController<>(this, "Flying", 5, this::controller));
+    }
+    
+    /*protected <E extends PostItEntity> PlayState controller(final AnimationState<E> event) {
+        return PlayState.STOP;
+    }*/
+    
 }

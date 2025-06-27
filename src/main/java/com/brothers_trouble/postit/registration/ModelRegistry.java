@@ -1,20 +1,23 @@
 package com.brothers_trouble.postit.registration;
 
 import com.brothers_trouble.postit.PostIt;
+import com.brothers_trouble.postit.entity.*;
+import com.brothers_trouble.postit.entity.entity_render.*;
 import com.brothers_trouble.postit.model.PostItModel;
-import com.brothers_trouble.postit.entity.entity_render.PostItRender;
+import net.minecraft.resources.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import software.bernie.geckolib.model.*;
 
 @EventBusSubscriber(modid = PostIt.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModelRegistry {
-//    public static final ModelLayerLocation POST_IT_MODEL_LAYER =
-//            new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "post_it_note"), "main");
-
+    
+    public static final GeoModel<PostItEntity> POST_IT_NOTE_MODEL = new DefaultedEntityGeoModel<>(ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "post_it_note"));
+    
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(PostItModel.LAYER_LOCATION, PostItModel::createBodyLayer);
