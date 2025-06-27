@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.post_it.new": {
+		"animation.post_it.test": {
 			"loop": true,
 			"animation_length": 5,
 			"bones": {
