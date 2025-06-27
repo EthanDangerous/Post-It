@@ -45,7 +45,7 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
         this.font = context.getFont();
     }
 
-    /*
+    
     @Override
     public void render(PostItEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
@@ -206,5 +206,5 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
                 ? Axis.YP.rotationDegrees(3*face.toYRot() - 90).mul(Axis.ZP.rotationDegrees(-90))
                 : Axis.ZP.rotationDegrees(180*(face.get3DDataValue() - 1))
                 .mul(Axis.YP.rotationDegrees(hori.toYRot() - 90));
-    }*/
+    }
 }

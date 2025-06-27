@@ -6,21 +6,28 @@
 				"identifier": "geometry.post_it_note",
 				"texture_width": 16,
 				"texture_height": 16,
-				"visible_bounds_width": 1,
-				"visible_bounds_height": 1,
-				"visible_bounds_offset": [0, 0, 0]
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 1.5,
+				"visible_bounds_offset": [0, 0.25, 0]
 			},
 			"bones": [
 				{
 					"name": "bone",
 					"pivot": [8, 0, -8],
-					"texture_meshes": [
+					"cubes": [
 						{
-							"texture": "postit:textures/entity/post_it",
-							"position": [0, 0, 0],
-							"rotation": [-90, -180, 0],
-							"local_pivot": [0, -7.5, 16],
-							"scale": [4, 10, 5]
+							"origin": [-12, -2, -8.001],
+							"size": [8, 4, 0],
+							"pivot": [-8, -2, 0],
+							"rotation": [0, -90, 0],
+							"uv": {
+								"north": {"uv": [0, 0], "uv_size": [8, 4]},
+								"east": {"uv": [0, 0], "uv_size": [0, 4]},
+								"south": {"uv": [0, 0], "uv_size": [8, 4]},
+								"west": {"uv": [0, 0], "uv_size": [0, 4]},
+								"up": {"uv": [8, 0], "uv_size": [-8, 0]},
+								"down": {"uv": [8, 0], "uv_size": [-8, 0]}
+							}
 						}
 					]
 				}
