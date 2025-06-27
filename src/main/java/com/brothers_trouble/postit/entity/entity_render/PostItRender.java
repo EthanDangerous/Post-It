@@ -3,6 +3,7 @@ package com.brothers_trouble.postit.entity.entity_render;
 import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.model.PostItModel;
 import com.brothers_trouble.postit.entity.PostItEntity;
+import com.brothers_trouble.postit.registration.*;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -26,27 +27,29 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
+import software.bernie.geckolib.renderer.*;
 
 import java.util.List;
 
 import static net.minecraft.client.renderer.blockentity.SignRenderer.getDarkColor;
 
 @OnlyIn(Dist.CLIENT)
-public class PostItRender extends EntityRenderer<PostItEntity> {
-    private final PostItModel model;
-    public static final ResourceLocation TEXTURE_LOCATION = PostIt.locate("textures/entity/post_it_note.png");
+public class PostItRender extends GeoEntityRenderer<PostItEntity> {
+    
     private static final Vec3 TEXT_OFFSET = new Vec3(0.0, 0.3333333432674408, 0.046666666865348816);
     private final Font font;
     private static final int OUTLINE_RENDER_DISTANCE = Mth.square(16);
 
     public PostItRender(EntityRendererProvider.Context context) {
-        super(context);
-        this.model = new PostItModel(context.bakeLayer(PostItModel.LAYER_LOCATION));
+        super(context, ModelRegistry.POST_IT_NOTE_MODEL);
         this.font = context.getFont();
     }
 
+    
     @Override
     public void render(PostItEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+        
 //        poseStack.pushPose();
 
         var faceDir = entity.face();
@@ -58,16 +61,14 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         if(horiDir.equals(Direction.NORTH) || horiDir.equals(Direction.SOUTH)){
             poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
         }
-
-        VertexConsumer modelCons = bufferSource.getBuffer(this.model.renderType(TEXTURE_LOCATION));
-        this.model.renderToBuffer(poseStack, modelCons, packedLight, OverlayTexture.NO_OVERLAY, entity.color());
+        
         poseStack.popPose();
 
         // Then render text with proper transformations
-        poseStack.pushPose();
+        //poseStack.pushPose();
 //        poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
         renderSignText(entity, entity.getOnPos(), entity.text(), poseStack, bufferSource, packedLight, 10, entity.getMaxTextLineWidth(), true);
-        poseStack.popPose();
+        //poseStack.popPose();
     }
 
     void renderSignText(PostItEntity entity, BlockPos pos, SignText text, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int lineHeight, int maxWidth, boolean isFrontText) {
@@ -170,11 +171,6 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
 
     public float getSignTextRenderScale() {
         return 0.6666667F;
-    }
-
-    @Override
-    public @NotNull ResourceLocation getTextureLocation(@NotNull PostItEntity entity) {
-        return TEXTURE_LOCATION;
     }
 
 //    public static Quaternionf calculateQuaternionRotation(Direction face, Direction hori) {
