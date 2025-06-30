@@ -238,10 +238,10 @@ public class PostItEntity extends Entity implements GeoEntity {
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "animation.post_it_note.test", 10, this::controller));
+        controllers.add(new AnimationController<>(this, "Main", 10, this::controller));
     }
     
-    protected static final RawAnimation TEST_ANIM = RawAnimation.begin().thenLoop("animation.post_it_note.test");
+    protected static final RawAnimation TEST_ANIM = RawAnimation.begin().thenLoop("animation.post_it.test");
     
     protected <E extends PostItEntity> PlayState controller(final AnimationState<E> event) {
         return event.setAndContinue(TEST_ANIM);
