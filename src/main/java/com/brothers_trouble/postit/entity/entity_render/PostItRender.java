@@ -48,30 +48,17 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
     
     @Override
     public void render(PostItEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
-        
-//        poseStack.pushPose();
-
         var faceDir = entity.face();
         var horiDir = entity.hori();
-
-        // Render model first
         poseStack.pushPose();
-        poseStack.mulPose(calculateQuaternionRotationForSign(faceDir, horiDir));
-        if(horiDir.equals(Direction.NORTH) || horiDir.equals(Direction.SOUTH)){
-            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
-        }
-        
+        poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
+        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
         poseStack.popPose();
-
-        // Then render text with proper transformations
-        //poseStack.pushPose();
-//        poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
-        renderSignText(entity, entity.getOnPos(), entity.text(), poseStack, bufferSource, packedLight, 10, entity.getMaxTextLineWidth(), true);
-        //poseStack.popPose();
+        
+        renderSignText(entity, entity.getOnPos(), entity.text(), poseStack, bufferSource, packedLight, 10, entity.getMaxTextLineWidth(), true, entityYaw, partialTick, bufferSource);
     }
 
-    void renderSignText(PostItEntity entity, BlockPos pos, SignText text, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int lineHeight, int maxWidth, boolean isFrontText) {
+    void renderSignText(PostItEntity entity, BlockPos pos, SignText text, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int lineHeight, int maxWidth, boolean isFrontText, float entityYaw, float partialTick, MultiBufferSource bufferSource) {
         poseStack.pushPose();
 
         // Apply the same rotation as the PostIt note
@@ -105,7 +92,6 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
 
         poseStack.translate(0, -0.086, 0.001); // Adjust the -0.1 value as needed
         poseStack.scale(0.25f, 0.25f, 0.25f);
-
 
         this.translateSignText(poseStack, isFrontText, this.getTextOffset());
         int i = getDarkColor(text);
