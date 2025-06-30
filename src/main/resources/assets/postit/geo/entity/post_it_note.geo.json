@@ -16,14 +16,14 @@
 					"pivot": [8, 0, -8],
 					"cubes": [
 						{
-							"origin": [-12, -2, -8.001],
-							"size": [8, 4, 0],
+							"origin": [-10, -2, -7.9],
+							"size": [4, 4, 0.001],
 							"pivot": [-8, -2, 0],
 							"rotation": [0, -90, 0],
 							"uv": {
-								"north": {"uv": [0, 0], "uv_size": [8, 4]},
+								"north": {"uv": [0, 0], "uv_size": [5, 4]},
 								"east": {"uv": [0, 0], "uv_size": [0, 4]},
-								"south": {"uv": [0, 0], "uv_size": [8, 4]},
+								"south": {"uv": [0, 0], "uv_size": [5, 4]},
 								"west": {"uv": [0, 0], "uv_size": [0, 4]},
 								"up": {"uv": [8, 0], "uv_size": [-8, 0]},
 								"down": {"uv": [8, 0], "uv_size": [-8, 0]}
