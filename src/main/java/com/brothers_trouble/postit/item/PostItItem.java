@@ -40,7 +40,7 @@ public class PostItItem extends Item{
             Direction side = context.getClickedFace();
 
             PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side, facing, stack);
-            postItEntity.setPos(vec3);
+            postItEntity.setPos(vec3.add(context.getClickedFace().getStepX() * 0.01, context.getClickedFace().getStepY() * 0.01, context.getClickedFace().getStepZ() * 0.01));
             level.addFreshEntity(postItEntity);
 
             stack.shrink(1);

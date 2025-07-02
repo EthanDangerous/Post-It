@@ -48,27 +48,14 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
     
     @Override
     public void render(PostItEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
-        
-//        poseStack.pushPose();
-
         var faceDir = entity.face();
         var horiDir = entity.hori();
-
-        // Render model first
         poseStack.pushPose();
-        poseStack.mulPose(calculateQuaternionRotationForSign(faceDir, horiDir));
-        if(horiDir.equals(Direction.NORTH) || horiDir.equals(Direction.SOUTH)){
-            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
-        }
-        
+        poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
+        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
         poseStack.popPose();
-
-        // Then render text with proper transformations
-        //poseStack.pushPose();
-//        poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
+        
         renderSignText(entity, entity.getOnPos(), entity.text(), poseStack, bufferSource, packedLight, 10, entity.getMaxTextLineWidth(), true);
-        //poseStack.popPose();
     }
 
     void renderSignText(PostItEntity entity, BlockPos pos, SignText text, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int lineHeight, int maxWidth, boolean isFrontText) {
@@ -78,34 +65,8 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
         var faceDir = entity.face();
         var horiDir = entity.hori(); // You might want to use actual horizontal direction
         poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
-//        if(!faceDir.equals(Direction.UP) && !faceDir.equals(Direction.DOWN)){
-//            poseStack.mulPose(Axis.YP.rotationDegrees(horiDir.toYRot())); // 90 degrees on Y axis
-//        }
-//        if(horiDir.equals(Direction.NORTH)){
-//            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F)); // 90 degrees on Y axis
-//            poseStack.mulPose(Axis.ZN.rotationDegrees(90.0F)); // 90 degrees on Z axis
-//            poseStack.mulPose(Axis.XP.rotationDegrees(90.0F)); // 90 degrees on Y axis
-//        }else if(horiDir.equals(Direction.EAST)){
-//            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F)); // 90 degrees on Y axis
-//            poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F)); // 90 degrees on Z axis
-//            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F)); // 90 degrees on Y axis
-//        }else if(horiDir.equals(Direction.SOUTH)){
-//            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F)); // 90 degrees on Y axis
-//            poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F)); // 90 degrees on Z axis
-//            poseStack.mulPose(Axis.XP.rotationDegrees(90.0F)); // 90 degrees on Y axis
-//        }else if(horiDir.equals(Direction.WEST)){
-//            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F)); // 90 degrees on Y axis
-//            poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F)); // 90 degrees on Z axis
-//            poseStack.mulPose(Axis.XP.rotationDegrees(0.0F)); // 90 degrees on Y axis
-//        }else{
-//            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F)); // 90 degrees on Y axis
-//            poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F)); // 90 degrees on Z axis
-//            poseStack.mulPose(Axis.XP.rotationDegrees(90.0F)); // 90 degrees on Y axis
-//        }
-
         poseStack.translate(0, -0.086, 0.001); // Adjust the -0.1 value as needed
         poseStack.scale(0.25f, 0.25f, 0.25f);
-
 
         this.translateSignText(poseStack, isFrontText, this.getTextOffset());
         int i = getDarkColor(text);
