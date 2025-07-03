@@ -28,6 +28,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import software.bernie.geckolib.renderer.*;
+import software.bernie.geckolib.util.Color;
 
 import java.util.List;
 
@@ -56,6 +57,24 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
         poseStack.popPose();
         
         renderSignText(entity, entity.getOnPos(), entity.text(), poseStack, bufferSource, packedLight, 10, entity.getMaxTextLineWidth(), true);
+    }
+
+    @Override
+    public Color getRenderColor(PostItEntity animatable, float partialTick, int packedLight) {
+        Color baseColor = super.getRenderColor(animatable, partialTick, packedLight);
+
+        int entityColor = animatable.color();
+
+        int red = (entityColor >> 16) & 0xFF;
+        int green = (entityColor >> 8) & 0xFF;
+        int blue = entityColor & 0xFF;
+
+        return Color.ofRGBA(
+                (int) (baseColor.getRed() * red / 255.0f),
+                (int) (baseColor.getGreen() * green / 255.0f),
+                (int) (baseColor.getBlue() * blue / 255.0f),
+                baseColor.getAlpha()
+        );
     }
 
     void renderSignText(PostItEntity entity, BlockPos pos, SignText text, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int lineHeight, int maxWidth, boolean isFrontText) {
