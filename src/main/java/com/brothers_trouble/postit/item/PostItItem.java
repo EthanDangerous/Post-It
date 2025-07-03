@@ -1,19 +1,32 @@
 package com.brothers_trouble.postit.item;
 
 import com.brothers_trouble.postit.entity.PostItEntity;
+import com.brothers_trouble.postit.menu.screen.NoteScreen;
 import com.brothers_trouble.postit.registration.EntityRegistry;
 import com.brothers_trouble.postit.registration.ItemRegistry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.NotNull;
 
 public class PostItItem extends Item{
@@ -48,4 +61,20 @@ public class PostItItem extends Item{
         }
         return InteractionResult.FAIL;
     }
+
+//    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+//        ItemStack itemstack = player.getItemInHand(hand);
+//
+//        if (!level.isClientSide) {
+//            if (!player.isShiftKeyDown()) {
+//                Minecraft.getInstance().setScreen(new NoteScreen(this, false));
+//
+////                return InteractionResult.SUCCESS;
+//            }
+//        }
+////            player.awardStat(Stats.ITEM_USED.get(this));
+////            player.gameEvent(GameEvent.ITEM_INTERACT_START);
+//
+//        return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
+//    }
 }

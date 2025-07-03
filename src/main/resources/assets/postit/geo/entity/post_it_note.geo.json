@@ -13,7 +13,7 @@
 			"bones": [
 				{
 					"name": "bone",
-					"pivot": [8, 0, -8],
+					"pivot": [0, 2, 0.1005],
 					"cubes": [
 						{
 							"origin": [-2, -2, 0.1],
