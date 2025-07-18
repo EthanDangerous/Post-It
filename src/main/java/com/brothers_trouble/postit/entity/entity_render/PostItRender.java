@@ -86,6 +86,7 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
         poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
         poseStack.translate(0, -0.08, 0.0); // Adjust the -0.1 value as needed
         poseStack.scale(0.25f, 0.25f, 0.25f);
+//        poseStack.mulPose(Axis.XP.rotationDegrees(poseStack.last().pose().m21()));
 
         this.translateSignText(poseStack, isFrontText, this.getTextOffset());
         int i = getDarkColor(text);
