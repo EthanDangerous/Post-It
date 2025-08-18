@@ -26,11 +26,14 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Quaternionf;
+import org.joml.*;
+import software.bernie.geckolib.cache.object.*;
+import software.bernie.geckolib.loading.json.raw.*;
+import software.bernie.geckolib.model.*;
 import software.bernie.geckolib.renderer.*;
 import software.bernie.geckolib.util.Color;
 
-import java.util.List;
+import java.util.*;
 
 import static net.minecraft.client.renderer.blockentity.SignRenderer.getDarkColor;
 
@@ -54,9 +57,9 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
         poseStack.pushPose();
         poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
-        poseStack.popPose();
         
         renderSignText(entity, entity.getOnPos(), entity.text(), poseStack, bufferSource, packedLight, 10, entity.getMaxTextLineWidth(), true);
+        poseStack.popPose();
     }
 
     @Override
@@ -83,17 +86,26 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
         // Apply the same rotation as the PostIt note
         var faceDir = entity.face();
         var horiDir = entity.hori(); // You might want to use actual horizontal direction
-        poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
+        //poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
         poseStack.translate(0, -0.08, 0.0); // Adjust the -0.1 value as needed
-        poseStack.scale(0.25f, 0.25f, 0.25f);
-//        poseStack.mulPose(Axis.XP.rotationDegrees(poseStack.last().pose().m21()));
+        //poseStack.scale(0.25f, 0.25f, 0.25f); // TODO: this kills the rotation
 
         this.translateSignText(poseStack, isFrontText, this.getTextOffset());
+        
+        // modify the poseStack based on the current animation state
+        GeoModel<PostItEntity> model = getGeoModel();
+        GeoBone bone = model.getBone("bone").orElse(null);
+        if(bone != null) {
+            poseStack.mulPose(Axis.XP.rotation(bone.getRotX()));
+            poseStack.mulPose(Axis.YP.rotation(bone.getRotY()));
+            poseStack.mulPose(Axis.ZP.rotation(bone.getRotZ()));
+        }
+        
         int i = getDarkColor(text);
         int j = 4 * lineHeight / 2;
         FormattedCharSequence[] aformattedcharsequence = text.getRenderMessages(Minecraft.getInstance().isTextFilteringEnabled(), (p_277227_) -> {
             List<FormattedCharSequence> list = this.font.split(p_277227_, maxWidth);
-            return list.isEmpty() ? FormattedCharSequence.EMPTY : (FormattedCharSequence)list.get(0);
+            return list.isEmpty() ? FormattedCharSequence.EMPTY : list.getFirst();
         });
         int k;
         boolean flag;
