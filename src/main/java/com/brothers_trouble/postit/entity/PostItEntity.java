@@ -6,6 +6,7 @@ import com.brothers_trouble.postit.menu.screen.NoteScreen;
 import com.brothers_trouble.postit.registration.EntityRegistry;
 import com.brothers_trouble.postit.registration.ItemRegistry;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponents;
@@ -23,7 +24,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DiodeBlock;
 import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -73,6 +77,37 @@ public class PostItEntity extends Entity implements GeoEntity {
         builder.define(NOTE_COLOR, PostItItem.DEFAULT_COLOR);
         builder.define(NOTE_TEXT, new SignText());
     }
+
+
+//    public void tick() {
+//        if (!this.level().isClientSide) {
+//            this.checkBelowWorld();
+//            if (this.checkInterval++ == 100) {
+//                this.checkInterval = 0;
+//                if (!this.isRemoved() && !this.survives()) {
+//                    this.discard();
+//                    this.dropItem((Entity)null);
+//                }
+//            }
+//        }
+//
+//    }
+//
+//    public boolean survives() {
+//        if (!this.level().noCollision(this)) {
+//            return false;
+//        } else {
+//            boolean flag = BlockPos.betweenClosedStream(this.calculateSupportBox()).filter((pos) -> {
+//                return !Block.canSupportCenter(this.level(), pos, this.direction);
+//            }).allMatch((p_350100_) -> {
+//                BlockState blockstate = this.level().getBlockState(p_350100_);
+//                return blockstate.isSolid() || DiodeBlock.isDiode(blockstate);
+//            });
+//            return !flag ? false : this.level().getEntities(this, this.getBoundingBox(), HANGING_ENTITY).isEmpty();
+//        }
+//    }
+
+
 
     @Override
     public void onSyncedDataUpdated(@NotNull EntityDataAccessor<?> dataAccessor) {

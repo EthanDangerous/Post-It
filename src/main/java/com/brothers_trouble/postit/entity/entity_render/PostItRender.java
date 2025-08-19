@@ -87,7 +87,7 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
         var faceDir = entity.face();
         var horiDir = entity.hori(); // You might want to use actual horizontal direction
         //poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
-        poseStack.translate(0, -0.08, 0.0); // Adjust the -0.1 value as needed
+        poseStack.translate(0, -0.32, -0.04); // Adjust the -0.1 value as needed
         //poseStack.scale(0.25f, 0.25f, 0.25f); // TODO: this kills the rotation
 
         this.translateSignText(poseStack, isFrontText, this.getTextOffset());
@@ -158,12 +158,14 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
         }
 
         float f = 0.015625F * this.getSignTextRenderScale();
+//        poseStack.translate(offset.x, offset.y, offset.z);
         poseStack.translate(offset.x, offset.y, offset.z);
         poseStack.scale(f, -f, f);
     }
 
     public float getSignTextRenderScale() {
-        return 0.6666667F;
+//        return 0.6666667F;
+        return 0.15F;
     }
 
 //    public static Quaternionf calculateQuaternionRotation(Direction face, Direction hori) {
