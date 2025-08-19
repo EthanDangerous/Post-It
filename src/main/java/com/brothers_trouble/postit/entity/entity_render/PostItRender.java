@@ -87,7 +87,7 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
         var faceDir = entity.face();
         var horiDir = entity.hori(); // You might want to use actual horizontal direction
         //poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
-        poseStack.translate(0, -0.32, -0.04); // Adjust the -0.1 value as needed
+        poseStack.translate(0, -0.32, -0.05); // Adjust the -0.1 value as needed
         //poseStack.scale(0.25f, 0.25f, 0.25f); // TODO: this kills the rotation
 
         this.translateSignText(poseStack, isFrontText, this.getTextOffset());
@@ -96,9 +96,12 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
         GeoModel<PostItEntity> model = getGeoModel();
         GeoBone bone = model.getBone("bone").orElse(null);
         if(bone != null) {
-            poseStack.mulPose(Axis.XP.rotation(bone.getRotX()));
-            poseStack.mulPose(Axis.YP.rotation(bone.getRotY()));
-            poseStack.mulPose(Axis.ZP.rotation(bone.getRotZ()));
+            poseStack.rotateAround(Axis.XP.rotation(bone.getRotX()), 0, -50, 0);
+            poseStack.rotateAround(Axis.YP.rotation(bone.getRotY()), 0, -50, 0);
+            poseStack.rotateAround(Axis.ZP.rotation(bone.getRotZ()), 0, -50, 0);
+//            poseStack.mulPose(Axis.XP.rotation(bone.getRotX()));
+//            poseStack.mulPose(Axis.YP.rotation(bone.getRotY()));
+//            poseStack.mulPose(Axis.ZP.rotation(bone.getRotZ()));
         }
         
         int i = getDarkColor(text);

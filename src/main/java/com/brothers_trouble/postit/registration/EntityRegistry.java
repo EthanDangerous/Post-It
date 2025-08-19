@@ -25,7 +25,7 @@ public class EntityRegistry {
     public static final DeferredHolder<EntityType<?>, EntityType<PostItEntity>> POST_IT_NOTE_ENTITY =
             ENTITY_TYPES.register("post_it_note",
                     () -> EntityType.Builder.<PostItEntity>of(PostItEntity::new, MobCategory.MISC) // Change category if needed
-                            .sized(0.25F, 0.1F)
+                            .sized(0.25F, 0.035F)
                             .build("post_it_note"));
 
     public static final EntityDataSerializer<SignText> NOTE_TEXT_DATA_SERIALIZER =  new EntityDataSerializer<>() {

@@ -134,11 +134,13 @@ public class PostItEntity extends Entity implements GeoEntity {
         AABB aABB = this.calculateBoundingBox(faceDirection);
         Vec3 vec3 = aABB.getCenter();
         this.setPosRaw(vec3.x, vec3.y, vec3.z);
+
+        //TODO: something is wrong here. after the first placement, the bounding box is no longer accurate
         this.setBoundingBox(aABB);
     }
 
     protected AABB calculateBoundingBox(Direction direction) {
-        float thickness = 0.05f;
+        float thickness = 0.035f;
         float length    = 0.25f;
 
         Vec3i normal = direction.getNormal();

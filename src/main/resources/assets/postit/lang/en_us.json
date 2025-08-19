@@ -1,4 +1,5 @@
 {
   "item.postit.post_it_note": "Post It Note",
-  "note.postit.edit": "Edit Note Text"
+  "note.postit.edit": "Edit Note Text",
+  "entity.postit.post_it_note": "Post It"
 }
