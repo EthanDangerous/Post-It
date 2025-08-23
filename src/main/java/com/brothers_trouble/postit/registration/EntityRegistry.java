@@ -26,6 +26,7 @@ public class EntityRegistry {
             ENTITY_TYPES.register("post_it_note",
                     () -> EntityType.Builder.<PostItEntity>of(PostItEntity::new, MobCategory.MISC) // Change category if needed
                             .sized(0.25F, 0.035F)
+                            .updateInterval(Integer.MAX_VALUE)  // since post-its don't move, we don't need to update data from server to client
                             .build("post_it_note"));
 
     public static final EntityDataSerializer<SignText> NOTE_TEXT_DATA_SERIALIZER =  new EntityDataSerializer<>() {
