@@ -144,7 +144,7 @@ public class PostItEntity extends Entity implements GeoEntity {
         float length    = 0.25f;
 
         Vec3i normal = direction.getNormal();
-        Vec3  offset = new Vec3(normal.getX(), normal.getY(), normal.getZ()).scale(thickness / 2);
+        Vec3  offset = new Vec3(normal.getX(), normal.getY(), normal.getZ()-0.5).scale(thickness / 2);
 
         Direction.Axis axis = direction.getAxis();
         double x = axis == Direction.Axis.X ? thickness : length;

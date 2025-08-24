@@ -55,6 +55,8 @@ public class PostItRender extends GeoEntityRenderer<PostItEntity> {
         var faceDir = entity.face();
         var horiDir = entity.hori();
         poseStack.pushPose();
+//        poseStack.translate(0, 0, -0.012);
+        //TODO: this here could be used to ensure the note is closer to the block, and ensuring it is inside of the hitbox completely
         poseStack.mulPose(calculateQuaternionRotation(faceDir, horiDir));
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
         

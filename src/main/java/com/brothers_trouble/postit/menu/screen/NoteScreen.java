@@ -5,6 +5,7 @@ import com.brothers_trouble.postit.entity.PostItEntity;
 import com.brothers_trouble.postit.model.PostItModel;
 import com.brothers_trouble.postit.registration.PacketRegistry;
 import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.font.TextFieldHelper;
@@ -23,6 +24,8 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.stream.IntStream;
+
+import static net.minecraft.util.FastColor.ARGB32.*;
 
 @OnlyIn(Dist.CLIENT)
 public class NoteScreen extends Screen {
@@ -104,15 +107,24 @@ public class NoteScreen extends Screen {
 	public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
 		super.render(guiGraphics, mouseX, mouseY, partialTick);
 		guiGraphics.flush();
+
 		Lighting.setupForFlatItems();
-		guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 40, 16777215);
 		this.renderSign(guiGraphics);
+
+		guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 40, 16777215);
 		guiGraphics.flush();
 		Lighting.setupFor3DItems();
 	}
 
 	@Override
 	public void renderBackground(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+//		float r = red(note.color());
+//		float g = green(note.color());
+//		float b = blue(note.color());
+//
+//		RenderSystem.setShaderColor(r/255, g/255, b/255, 1.0F);
+//		guiGraphics.blit(BACKGROUND_TEXTURE, (this.width - 160)/2, (this.height - 160)/2, 0, 0, 160, 160);
+//		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		this.renderTransparentBackground(guiGraphics);
 	}
 
@@ -138,7 +150,8 @@ public class NoteScreen extends Screen {
 	}
 
 	protected void offsetSign(GuiGraphics guiGraphics) {
-		guiGraphics.pose().translate(this.width / 2.0F, 90.0F, 50.0F);
+//		guiGraphics.pose().translate(this.width / 2.0F, 90.0F, 50.0F);
+		guiGraphics.pose().translate(-this.width/5.3, -60.0F, -0.001F);
 	}
 
 	private void renderSign(GuiGraphics guiGraphics) {
@@ -146,7 +159,15 @@ public class NoteScreen extends Screen {
 		this.offsetSign(guiGraphics);
 		guiGraphics.pose().pushPose();
 		// TODO: render background here
-		guiGraphics.blit(BACKGROUND_TEXTURE, width/2, height/2, 0, 0, 160, 160);
+		float r = red(note.color());
+		float g = green(note.color());
+		float b = blue(note.color());
+
+		RenderSystem.setShaderColor(r/255, g/255, b/255, 1.0F);
+		guiGraphics.blit(BACKGROUND_TEXTURE, (this.width - 160)/2, (this.height - 160)/2, 0, 0, 160, 160);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+//		guiGraphics.blit(BACKGROUND_TEXTURE, width/2, height/2, 0, 0, 160, 160);
+		// TODO: for some reason this gui isnt rendering? ^
 		guiGraphics.pose().popPose();
 		this.renderSignText(guiGraphics);
 		guiGraphics.pose().popPose();
