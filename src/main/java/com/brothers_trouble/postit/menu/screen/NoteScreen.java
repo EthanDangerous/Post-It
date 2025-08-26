@@ -2,16 +2,18 @@ package com.brothers_trouble.postit.menu.screen;
 
 import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.entity.PostItEntity;
+import com.brothers_trouble.postit.entity.entity_render.PostItRender;
 import com.brothers_trouble.postit.model.PostItModel;
 import com.brothers_trouble.postit.registration.PacketRegistry;
 import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -25,8 +27,6 @@ import org.joml.Vector3f;
 
 import java.util.stream.IntStream;
 
-import static net.minecraft.util.FastColor.ARGB32.*;
-
 @OnlyIn(Dist.CLIENT)
 public class NoteScreen extends Screen {
 	private final PostItEntity note;
@@ -38,7 +38,7 @@ public class NoteScreen extends Screen {
 	@Nullable
 	private TextFieldHelper signField;
 
-    private ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/example_container.png");
+    private final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/example_container.png");
 
 	public NoteScreen(PostItEntity note, boolean isFiltered) {
 		this(note, isFiltered, Component.translatable("note.postit.edit"));
@@ -63,7 +63,7 @@ public class NoteScreen extends Screen {
 				this::setMessage,
 				TextFieldHelper.createClipboardGetter(this.minecraft),
 				TextFieldHelper.createClipboardSetter(this.minecraft),
-				string -> this.minecraft.font.width(string) <= this.note.getMaxTextLineWidth()
+				string -> this.minecraft.font.width(string) <= this.note.maxTextLineWidth()
 		);
 	}
 
@@ -158,16 +158,12 @@ public class NoteScreen extends Screen {
 		guiGraphics.pose().pushPose();
 		this.offsetSign(guiGraphics);
 		guiGraphics.pose().pushPose();
-		// TODO: render background here
-		float r = red(note.color());
-		float g = green(note.color());
-		float b = blue(note.color());
-
-		RenderSystem.setShaderColor(r/255, g/255, b/255, 1.0F);
-		guiGraphics.blit(BACKGROUND_TEXTURE, (this.width - 160)/2, (this.height - 160)/2, 0, 0, 160, 160);
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-//		guiGraphics.blit(BACKGROUND_TEXTURE, width/2, height/2, 0, 0, 160, 160);
-		// TODO: for some reason this gui isnt rendering? ^
+		guiGraphics.pose().translate(0.0F, 0.0F, -1.0F);
+		//guiGraphics.pose().scale(62.500004F, 62.500004F, -62.500004F);
+		var source = guiGraphics.bufferSource();
+		VertexConsumer modelCons = source.getBuffer(this.model.renderType(PostItRender.TEXTURE_LOCATION));
+		this.model.renderToBuffer(guiGraphics.pose(), modelCons, 0xf000f0, OverlayTexture.NO_OVERLAY, note.color());
+		guiGraphics.flush();
 		guiGraphics.pose().popPose();
 		this.renderSignText(guiGraphics);
 		guiGraphics.pose().popPose();
@@ -178,51 +174,46 @@ public class NoteScreen extends Screen {
 		guiGraphics.pose().translate(0.0F, 0.0F, 4.0F);
 		Vector3f vector3f = this.getSignTextScale();
 		guiGraphics.pose().scale(vector3f.x(), vector3f.y(), vector3f.z());
-		int i = this.text.hasGlowingText() ? this.text.getColor().getTextColor() : SignRenderer.getDarkColor(this.text);
-		boolean bl = this.frame / 6 % 2 == 0;
-		int j = this.signField.getCursorPos();
-		int k = this.signField.getSelectionPos();
-		int l = 4 * this.note.getTextLineHeight() / 2;
-		int m = this.line * this.note.getTextLineHeight() - l;
+		int textColor = this.text.hasGlowingText() ? this.text.getColor().getTextColor() : SignRenderer.getDarkColor(this.text);
+		boolean cursorBlink = this.frame / 6 % 2 == 0;
+		int cursorPos = this.signField.getCursorPos();
+		int selectionPos = this.signField.getSelectionPos();
+		int lineOffset = 4 * this.note.maxTextLineHeight() / 2;
+		int lineY = this.line * this.note.maxTextLineHeight() - lineOffset;
 
-		for (int n = 0; n < this.messages.length; n++) {
-			String string = this.messages[n];
-			if (string != null) {
-				if (this.font.isBidirectional()) {
-					string = this.font.bidirectionalShaping(string);
-				}
+		for (int m = 0; m < this.messages.length; m++) {
+			String message = this.messages[m];
+			if (message == null) continue;
 
-				int o = -this.font.width(string) / 2;
-				guiGraphics.drawString(this.font, string, o, n * this.note.getTextLineHeight() - l, i, false);
-				if (n == this.line && j >= 0 && bl) {
-					int p = this.font.width(string.substring(0, Math.min(j, string.length())));
-					int q = p - this.font.width(string) / 2;
-					if (j >= string.length()) {
-						guiGraphics.drawString(this.font, "_", q, m, i, false);
-					}
+			if (this.font.isBidirectional()) message = this.font.bidirectionalShaping(message);
+
+			int xOffset = -this.font.width(message) / 2;
+			guiGraphics.drawString(this.font, message, xOffset, m * this.note.maxTextLineHeight() - lineOffset, textColor, false);
+			if (m == this.line && cursorPos >= 0 && cursorBlink) {
+				int selected = this.font.width(message.substring(0, Math.min(cursorPos, message.length())));
+				int cursorX = selected - this.font.width(message) / 2;
+				if (cursorPos >= message.length()) {
+					guiGraphics.drawString(this.font, "_", cursorX, lineY, textColor, false);
 				}
 			}
 		}
 
-		for (int nx = 0; nx < this.messages.length; nx++) {
-			String string = this.messages[nx];
-			if (string != null && nx == this.line && j >= 0) {
-				int o = this.font.width(string.substring(0, Math.min(j, string.length())));
-				int p = o - this.font.width(string) / 2;
-				if (bl && j < string.length()) {
-					guiGraphics.fill(p, m - 1, p + 1, m + this.note.getTextLineHeight(), 0xFF000000 | i);
-				}
+		for (int m = 0; m < this.messages.length; m++) {
+			String message = this.messages[m];
+			if (message == null || m != this.line || cursorPos < 0) continue;
 
-				if (k != j) {
-					int q = Math.min(j, k);
-					int r = Math.max(j, k);
-					int s = this.font.width(string.substring(0, q)) - this.font.width(string) / 2;
-					int t = this.font.width(string.substring(0, r)) - this.font.width(string) / 2;
-					int u = Math.min(s, t);
-					int v = Math.max(s, t);
-					guiGraphics.fill(RenderType.guiTextHighlight(), u, m, v, m + this.note.getTextLineHeight(), -16776961);
-				}
-			}
+			int o = this.font.width(message.substring(0, Math.min(cursorPos, message.length())));
+			int p = o - this.font.width(message) / 2;
+			if (cursorBlink && cursorPos < message.length()) guiGraphics.fill(p, lineY - 1, p + 1, lineY + this.note.maxTextLineHeight(), 0xFF000000 | textColor);
+
+			if (selectionPos == cursorPos) continue;
+			int minPos = Math.min(cursorPos, selectionPos);
+			int maxPos = Math.max(cursorPos, selectionPos);
+			int off1 = this.font.width(message.substring(0, minPos)) - this.font.width(message) / 2;
+			int off2 = this.font.width(message.substring(0, maxPos)) - this.font.width(message) / 2;
+			int minX = Math.min(off1, off2);
+			int maxX = Math.max(off1, off2);
+			guiGraphics.fill(RenderType.guiTextHighlight(), minX, lineY, maxX, lineY + this.note.maxTextLineHeight(), 0xff0000ff);
 		}
 	}
 

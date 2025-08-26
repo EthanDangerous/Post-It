@@ -24,10 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.DiodeBlock;
 import net.minecraft.world.level.block.entity.SignText;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +36,11 @@ import software.bernie.geckolib.util.*;
 import java.util.Objects;
 
 public class PostItEntity extends Entity implements GeoEntity {
+    public static final float TEXT_SCALE       = 1F/6F;
+    public static final Vec3  TEXT_OFFSET      = new Vec3(0.0, 0.0F, 0.0F);
+    public static final int   TEXT_LINE_HEIGHT = 10;
+    public static final int   MAX_TEXT_WIDTH   = 90;
+
     protected static final EntityDataAccessor<Direction> FACE_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
     protected static final EntityDataAccessor<Direction> HORI_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
 
@@ -46,8 +48,6 @@ public class PostItEntity extends Entity implements GeoEntity {
     protected static final EntityDataAccessor<SignText> NOTE_TEXT = SynchedEntityData.defineId(PostItEntity.class, EntityRegistry.NOTE_TEXT_DATA_SERIALIZER);
 
     protected final ItemStack stack;
-    private static final int MAX_TEXT_LINE_WIDTH = 90;
-    private static final int TEXT_LINE_HEIGHT = 10;
     
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
@@ -218,12 +218,20 @@ public class PostItEntity extends Entity implements GeoEntity {
         Minecraft.getInstance().setScreen(new NoteScreen(this, false));
     }
 
-    public int getMaxTextLineWidth() {
-        return MAX_TEXT_LINE_WIDTH;
+    public int maxTextLineHeight() {
+        return TEXT_LINE_HEIGHT;
     }
 
-    public int getTextLineHeight() {
-        return TEXT_LINE_HEIGHT;
+    public int maxTextLineWidth() {
+        return MAX_TEXT_WIDTH;
+    }
+
+    public Vec3 textOffset() {
+        return TEXT_OFFSET;
+    }
+
+    public float textScale() {
+        return TEXT_SCALE;
     }
 
     @Override
