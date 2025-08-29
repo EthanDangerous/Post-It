@@ -164,7 +164,8 @@ public class NoteScreen extends Screen {
 		float b = blue(note.color());
 
 		RenderSystem.setShaderColor(r/255, g/255, b/255, 1.0F);
-		guiGraphics.blit(BACKGROUND_TEXTURE, (this.width - 160)/2, (this.height - 160)/2, 0, 0, 160, 160);
+		guiGraphics.blit(BACKGROUND_TEXTURE, (guiGraphics.guiWidth()-160)/2, (guiGraphics.guiHeight()-160)/2, 0, 0, 160, 160);
+//		System.out.println(guiGraphics.guiWidth() + " " + guiGraphics.guiHeight() +"\n" + (guiGraphics.guiWidth()-160)/2 + " " + (guiGraphics.guiHeight()-160)/2);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 //		guiGraphics.blit(BACKGROUND_TEXTURE, width/2, height/2, 0, 0, 160, 160);
 		// TODO: for some reason this gui isnt rendering? ^
