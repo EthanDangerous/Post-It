@@ -51,6 +51,7 @@ public class PostItItem extends Item{
         if (player.isShiftKeyDown()) {
             Vec3 vec3 = context.getClickLocation();
             Direction side = context.getClickedFace();
+            if (side.getAxis().isHorizontal()) facing = side.getOpposite(); // snap facing direction to side if horizontal
 
             PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side, facing, stack);
             postItEntity.setPos(vec3.add(context.getClickedFace().getStepX() * 0.01, context.getClickedFace().getStepY() * 0.01, context.getClickedFace().getStepZ() * 0.01));
