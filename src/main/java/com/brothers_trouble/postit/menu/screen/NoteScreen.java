@@ -158,12 +158,16 @@ public class NoteScreen extends Screen {
 		guiGraphics.pose().pushPose();
 		this.offsetSign(guiGraphics);
 		guiGraphics.pose().pushPose();
-		guiGraphics.pose().translate(0.0F, 0.0F, -1.0F);
-		//guiGraphics.pose().scale(62.500004F, 62.500004F, -62.500004F);
-		var source = guiGraphics.bufferSource();
-		VertexConsumer modelCons = source.getBuffer(this.model.renderType(PostItRender.TEXTURE_LOCATION));
-		this.model.renderToBuffer(guiGraphics.pose(), modelCons, 0xf000f0, OverlayTexture.NO_OVERLAY, note.color());
-		guiGraphics.flush();
+		// TODO: render background here
+		float r = red(note.color());
+		float g = green(note.color());
+		float b = blue(note.color());
+
+		RenderSystem.setShaderColor(r/255, g/255, b/255, 1.0F);
+		guiGraphics.blit(BACKGROUND_TEXTURE, (this.width - 160)/2, (this.height - 160)/2, 0, 0, 160, 160);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+//		guiGraphics.blit(BACKGROUND_TEXTURE, width/2, height/2, 0, 0, 160, 160);
+		// TODO: for some reason this gui isnt rendering? ^
 		guiGraphics.pose().popPose();
 		this.renderSignText(guiGraphics);
 		guiGraphics.pose().popPose();
