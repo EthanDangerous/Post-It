@@ -6,6 +6,7 @@ import com.brothers_trouble.postit.entity.entity_render.PostItRender;
 import com.brothers_trouble.postit.model.PostItModel;
 import com.brothers_trouble.postit.registration.PacketRegistry;
 import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -24,7 +25,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-
+import static net.minecraft.util.FastColor.ARGB32.*;
 import java.util.stream.IntStream;
 
 @OnlyIn(Dist.CLIENT)
