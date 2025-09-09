@@ -2,19 +2,15 @@ package com.brothers_trouble.postit.menu.screen;
 
 import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.entity.PostItEntity;
-import com.brothers_trouble.postit.entity.entity_render.PostItRender;
-import com.brothers_trouble.postit.model.PostItModel;
 import com.brothers_trouble.postit.registration.PacketRegistry;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -31,7 +27,6 @@ import java.util.stream.IntStream;
 @OnlyIn(Dist.CLIENT)
 public class NoteScreen extends Screen {
 	private final PostItEntity note;
-	private PostItModel model;
 	private SignText text;
 	private final String[] messages;
 	private int frame;
@@ -58,7 +53,6 @@ public class NoteScreen extends Screen {
 				Button.builder(CommonComponents.GUI_DONE, button -> this.onDone()).bounds(this.width / 2 - 100, this.height / 4 + 144, 200, 20).build()
 		);
 		assert this.minecraft != null;
-		this.model = new PostItModel(this.minecraft.getEntityModels().bakeLayer(PostItModel.LAYER_LOCATION));
 		this.signField = new TextFieldHelper(
 				() -> this.messages[this.line],
 				this::setMessage,
@@ -119,13 +113,6 @@ public class NoteScreen extends Screen {
 
 	@Override
 	public void renderBackground(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-//		float r = red(note.color());
-//		float g = green(note.color());
-//		float b = blue(note.color());
-//
-//		RenderSystem.setShaderColor(r/255, g/255, b/255, 1.0F);
-//		guiGraphics.blit(BACKGROUND_TEXTURE, (this.width - 160)/2, (this.height - 160)/2, 0, 0, 160, 160);
-//		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		this.renderTransparentBackground(guiGraphics);
 	}
 
@@ -151,25 +138,22 @@ public class NoteScreen extends Screen {
 	}
 
 	protected void offsetSign(GuiGraphics guiGraphics) {
-//		guiGraphics.pose().translate(this.width / 2.0F, 90.0F, 50.0F);
-		guiGraphics.pose().translate(-this.width/5.3, -60.0F, -0.001F);
+		guiGraphics.pose().translate(this.width / 2.0F, this.height / 2.0F, 50.0F);
 	}
 
 	private void renderSign(GuiGraphics guiGraphics) {
 		guiGraphics.pose().pushPose();
 		this.offsetSign(guiGraphics);
-		guiGraphics.pose().pushPose();
+
 		// TODO: render background here
 		float r = red(note.color());
 		float g = green(note.color());
 		float b = blue(note.color());
 
 		RenderSystem.setShaderColor(r/255, g/255, b/255, 1.0F);
-		guiGraphics.blit(BACKGROUND_TEXTURE, (this.width - 160)/2, (this.height - 160)/2, 0, 0, 160, 160);
+		guiGraphics.blit(BACKGROUND_TEXTURE, -160/2, -160/2, 0, 0, 160, 160);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-//		guiGraphics.blit(BACKGROUND_TEXTURE, width/2, height/2, 0, 0, 160, 160);
-		// TODO: for some reason this gui isnt rendering? ^
-		guiGraphics.pose().popPose();
+
 		this.renderSignText(guiGraphics);
 		guiGraphics.pose().popPose();
 	}

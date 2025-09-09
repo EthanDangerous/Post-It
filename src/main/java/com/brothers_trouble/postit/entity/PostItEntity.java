@@ -6,7 +6,6 @@ import com.brothers_trouble.postit.menu.screen.NoteScreen;
 import com.brothers_trouble.postit.registration.EntityRegistry;
 import com.brothers_trouble.postit.registration.ItemRegistry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponents;
@@ -172,13 +171,14 @@ public class PostItEntity extends Entity implements GeoEntity {
         this.entityData.set(NOTE_COLOR, color);
     }
 
+	// Facing direction of the note.
     public @NotNull Direction face() {
-        //FACE OF BLOCK
         return Objects.requireNonNull(this.entityData.get(FACE_DIRECTION));
     }
 
+	// Horizontal direction (or, more correctly, rotation) of the note.
+	// Note that it only matters if the facing direction is either UP or DOWN, otherwise it's trivially derivable from the facing direction.
     public @NotNull Direction hori() {
-        //DIRECTION OF PLACEMENT
         return Objects.requireNonNull(this.entityData.get(HORI_DIRECTION));
     }
 
