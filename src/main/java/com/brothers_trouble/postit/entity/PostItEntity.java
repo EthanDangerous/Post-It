@@ -15,6 +15,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -41,6 +42,10 @@ public class PostItEntity extends Entity implements GeoEntity {
     public static final int   TEXT_LINE_HEIGHT = 10;
     public static final int   MAX_TEXT_WIDTH   = 90;
 
+    // how often (in ticks) we re-check whether the block behind the note is still there.
+    // same idea as vanilla HangingEntity's checkInterval polling, just a plain constant here.
+    private static final int SUPPORT_CHECK_INTERVAL = 20;
+
     protected static final EntityDataAccessor<Direction> FACE_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
     protected static final EntityDataAccessor<Direction> HORI_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
 
@@ -48,7 +53,7 @@ public class PostItEntity extends Entity implements GeoEntity {
     protected static final EntityDataAccessor<SignText> NOTE_TEXT = SynchedEntityData.defineId(PostItEntity.class, EntityRegistry.NOTE_TEXT_DATA_SERIALIZER);
 
     protected final ItemStack stack;
-    
+
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level) {
@@ -78,36 +83,40 @@ public class PostItEntity extends Entity implements GeoEntity {
         builder.define(NOTE_TEXT, new SignText());
     }
 
+    @Override
+    public void tick() {
+        super.tick();
 
-//    public void tick() {
-//        if (!this.level().isClientSide) {
-//            this.checkBelowWorld();
-//            if (this.checkInterval++ == 100) {
-//                this.checkInterval = 0;
-//                if (!this.isRemoved() && !this.survives()) {
-//                    this.discard();
-//                    this.dropItem((Entity)null);
-//                }
-//            }
-//        }
-//
-//    }
-//
-//    public boolean survives() {
-//        if (!this.level().noCollision(this)) {
-//            return false;
-//        } else {
-//            boolean flag = BlockPos.betweenClosedStream(this.calculateSupportBox()).filter((pos) -> {
-//                return !Block.canSupportCenter(this.level(), pos, this.direction);
-//            }).allMatch((p_350100_) -> {
-//                BlockState blockstate = this.level().getBlockState(p_350100_);
-//                return blockstate.isSolid() || DiodeBlock.isDiode(blockstate);
-//            });
-//            return !flag ? false : this.level().getEntities(this, this.getBoundingBox(), HANGING_ENTITY).isEmpty();
-//        }
-//    }
+        // Notes don't move, so this is only ever about noticing that the supporting block is gone.
+        // Polling every SUPPORT_CHECK_INTERVAL ticks instead of every tick keeps this cheap.
+        if (!this.level().isClientSide
+                && !this.isRemoved()
+                && this.tickCount % SUPPORT_CHECK_INTERVAL == 0
+                && !this.survives()) {
+            this.dropAndDiscard();
+        }
+    }
 
+    /** The block position the note is actually stuck to (one step "into" the block from the note itself). */
+    protected BlockPos attachedBlockPos() {
+        return BlockPos.containing(this.position()).relative(this.face().getOpposite());
+    }
 
+    /** True while the block behind the note can still hold it up. */
+    public boolean survives() {
+        if (this.level().isOutsideBuildHeight(this.blockPosition())) return false;
+
+        BlockPos supportPos = attachedBlockPos();
+        return this.level().getBlockState(supportPos).isFaceSturdy(this.level(), supportPos, this.face());
+    }
+
+    /** Pops the note off as a dropped item and removes the entity. Used both when the block behind it
+     *  disappears (see {@link #tick()}) and when a player punches it (see {@link #hurt}). */
+    protected void dropAndDiscard() {
+        this.spawnAtLocation(getPickupStack());
+        this.playSound(SoundEvents.ITEM_FRAME_BREAK, 1.0F, 1.0F);
+        this.discard();
+    }
 
     @Override
     public void onSyncedDataUpdated(@NotNull EntityDataAccessor<?> dataAccessor) {
@@ -131,7 +140,7 @@ public class PostItEntity extends Entity implements GeoEntity {
     }
 
     protected final void recalculateBoundingBox(Direction faceDirection) {
-        AABB aABB = this.calculateBoundingBox(faceDirection);
+        AABB aABB = calculateBoundingBox(faceDirection, this.position());
         Vec3 vec3 = aABB.getCenter();
         this.setPosRaw(vec3.x, vec3.y, vec3.z);
 
@@ -139,7 +148,13 @@ public class PostItEntity extends Entity implements GeoEntity {
         this.setBoundingBox(aABB);
     }
 
-    protected AABB calculateBoundingBox(Direction direction) {
+    /**
+     * Static (and takes an explicit position) so PostItItem can predict a not-yet-spawned note's
+     * bounding box and check it for overlap with existing notes before ever creating the entity.
+     * Note: this is called during the constructor with position (0,0,0) since setPos() hasn't run
+     * yet - call {@link #refreshBoundingBox()} after positioning the entity to fix that up.
+     */
+    public static AABB calculateBoundingBox(Direction direction, Vec3 pos) {
         float thickness = 0.035f;
         float length    = 0.25f;
 
@@ -150,7 +165,14 @@ public class PostItEntity extends Entity implements GeoEntity {
         double x = axis == Direction.Axis.X ? thickness : length;
         double y = axis == Direction.Axis.Y ? thickness : length;
         double z = axis == Direction.Axis.Z ? thickness : length;
-        return AABB.ofSize(position().add(offset), x, y, z);
+        return AABB.ofSize(pos.add(offset), x, y, z);
+    }
+
+    /** Recomputes the bounding box using the entity's *current* position. Call this after
+     *  {@code setPos(...)} on a freshly-constructed note, since the constructor computes the
+     *  box using position (0,0,0) before placement ever happens. */
+    public void refreshBoundingBox() {
+        recalculateBoundingBox(face());
     }
 
     public void setFaceDirection(@NotNull Direction faceDirection, boolean forceUpdate) {
@@ -241,7 +263,24 @@ public class PostItEntity extends Entity implements GeoEntity {
 
     @Override
     public boolean hurt(@NotNull DamageSource source, float amount) {
-        return false;
+        if (this.isRemoved()) return false;
+        if (this.level().isClientSide) return true;
+        if (this.isInvulnerableTo(source)) return false;
+
+        // Punching the note breaks it and gives it back, same shape as vanilla ItemFrame/
+        // Painting#hurt - creative-mode players just pop it off without a drop.
+        this.markHurt();
+
+        Entity attacker = source.getEntity();
+        boolean creative = attacker instanceof Player player && player.getAbilities().instabuild;
+
+        if (creative) {
+            this.playSound(SoundEvents.ITEM_FRAME_BREAK, 1.0F, 1.0F);
+            this.discard();
+        } else {
+            this.dropAndDiscard();
+        }
+        return true;
     }
 
     // copied from mojank serialization slop, don't blame me
@@ -275,21 +314,21 @@ public class PostItEntity extends Entity implements GeoEntity {
         tag.putByte("HorizontalDirection", (byte) hori().get2DDataValue());
         tag.putByte("FacingDirection",     (byte) face().get3DDataValue());
     }
-    
+
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.geoCache;
     }
-    
+
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "Main", 10, this::controller));
     }
-    
+
     protected static final RawAnimation TEST_ANIM = RawAnimation.begin().thenLoop("animation.post_it.test");
-    
+
     protected <E extends PostItEntity> PlayState controller(final AnimationState<E> event) {
         return event.setAndContinue(TEST_ANIM);
     }
-    
+
 }

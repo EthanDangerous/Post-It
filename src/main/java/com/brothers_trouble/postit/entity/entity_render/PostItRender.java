@@ -55,16 +55,31 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
     private static final float SWAY_PERIOD_TICKS = 120F; // 6 seconds @ 20 tps
     private static final float SWAY_AMPLITUDE    = 5F;   // degrees
 
+    /**
+     * Reference: any vanilla EntityRendererProvider.Context-taking constructor, e.g.
+     * ItemFrameRenderer / PaintingRenderer (net.minecraft.client.renderer.entity). Grabs the shared
+     * Font instance we need later to draw the note's text.
+     */
     public PostItRender(EntityRendererProvider.Context context) {
         super(context);
         this.font = context.getFont();
     }
 
+    /**
+     * Reference: EntityRenderer#getTextureLocation javadoc, same as PaintingRenderer/ItemFrameRenderer.
+     * Tells the renderer which texture to bind for this entity; we only have one, so it's constant.
+     */
     @Override
     public ResourceLocation getTextureLocation(PostItEntity entity) {
         return TEXTURE_LOCATION;
     }
 
+    /**
+     * Reference: EntityRenderer#render javadoc + vanilla HangingEntityRenderer/PaintingRenderer for the
+     * "orient to a block face" pattern. Main per-frame entry point: rotate to face the block, snap onto
+     * its surface, apply the sway animation, then draw the quad and the sign-style text inside the same
+     * pose so both inherit the same facing/sway.
+     */
     @Override
     public void render(PostItEntity entity, float entityYaw, float partialTick, PoseStack poseStack,
                        MultiBufferSource bufferSource, int packedLight) {
@@ -94,13 +109,22 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         poseStack.popPose();
     }
 
-    /** deterministic per-entity phase offset so multiple notes don't all sway in lockstep */
+    /**
+     * Simple per-entity offset trick with no direct vanilla equivalent (closest cousin is how
+     * vanilla staggers ambient particle/animation timing per-block-entity, e.g. leaves rustling).
+     * Deterministic per-entity phase offset so multiple notes don't all sway in lockstep.
+     */
     private static float phase(PostItEntity entity) {
         return (entity.getId() * 37) % 1000;
     }
 
-    // notes tend to inexplicably "drift" away from the block surface slightly on save and reload, correct for that.
-    // could be a raycast to the target block, but this is much cheaper
+    /**
+     * Custom drift-correction fix; no direct vanilla equivalent, closest reference is how
+     * BlockEntityRenderers nudge things by fractions of a pixel to avoid z-fighting with the block
+     * they're attached to (e.g. SignRenderer, BannerRenderer).
+     * Notes tend to inexplicably "drift" away from the block surface slightly on save and reload,
+     * correct for that. Could be a raycast to the target block, but this is much cheaper.
+     */
     public static void snapNoteToBlock(PoseStack poseStack, Direction faceDir, Vec3 pos) {
         var axis = faceDir.getAxis();
         var ord  = axis.choose(pos.x(), pos.y(), pos.z());
@@ -112,10 +136,17 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         poseStack.translate(0, 0, delta + .01); // +0.01 to avoid the note clipping into the block
     }
 
+    /**
+     * Reference: net.minecraft.client.renderer.ItemInHandRenderer / MapRenderer for the pattern of
+     * hand-building a quad straight into a VertexConsumer instead of using a baked BakedModel.
+     * Used here instead of a baked model because we need per-instance UV cropping and a dyeable tint
+     * that a normal item/block model pipeline doesn't give us easily.
+     * Draws a single-sided cutout quad twice (front winding + reversed winding for the back) so the
+     * note is visible - and shows the art, not just blank - from either side. entityCutoutNoCull is
+     * used below so this holds even if the winding math is ever slightly off.
+     */
     private void renderQuad(PostItEntity entity, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        // single-sided cutout: the old cube had ~0 thickness, so front/back faces nearly coincided and
-        // z-fought every frame (the "shows twice" flicker). One culled quad has nothing to fight with.
-        VertexConsumer vc = bufferSource.getBuffer(RenderType.entityCutout(TEXTURE_LOCATION));
+        VertexConsumer vc = bufferSource.getBuffer(RenderType.entityCutoutNoCull(TEXTURE_LOCATION));
         Matrix4f pose = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal();
 
@@ -140,6 +171,10 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         vertex(vc, pose, normal, -HALF_WIDTH,  HALF_HEIGHT, r, g, b, UV_MAX, 0,      0, 0, -1, packedLight);
     }
 
+    /**
+     * Reference: standard VertexConsumer builder-chain usage seen throughout net.minecraft.client.renderer
+     * (e.g. ItemInHandRenderer, particle renderers). One vertex worth of position/color/uv/overlay/light/normal.
+     */
     private void vertex(VertexConsumer vc, Matrix4f pose, Matrix3f normal,
                         float x, float y, int r, int g, int b, float u, float v,
                         float nx, float ny, float nz, int light) {
@@ -157,6 +192,11 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
                 .setNormal(n.x(), n.y(), n.z());
     }
 
+    /**
+     * Reference: net.minecraft.client.renderer.blockentity.SignRenderer#renderSignText - this method
+     * is adapted almost directly from vanilla sign text rendering (same glow/outline handling, same
+     * per-line loop), just driven by our own line-height/width instead of a SignBlockEntity's.
+     */
     void renderText(PostItEntity entity, BlockPos pos, SignText text, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
 
@@ -199,12 +239,21 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         poseStack.popPose();
     }
 
+    /**
+     * Reference: SignRenderer's text scaling (offset then scale by 1/64) - matches how vanilla shrinks
+     * screen-space-sized text down into world space for signs.
+     */
     private static void translateSignText(PoseStack poseStack, float textScale, Vec3 offset) {
         poseStack.translate(offset.x, offset.y, offset.z);
         float scale = textScale / 64;
         poseStack.scale(scale, -scale, scale);
     }
 
+    /**
+     * Reference: SignRenderer#isOutlineVisible - this is effectively a straight copy. Decides when
+     * glowing text needs the dark outline pass for legibility (black text, scoped, or close enough
+     * to the camera).
+     */
     static boolean isOutlineVisible(BlockPos pos, int textColor) {
         if (textColor == DyeColor.BLACK.getTextColor()) return true;
 
@@ -221,6 +270,11 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
 
     public static final Quaternionf[] signRotations = memoizeQuaternionRotations();
 
+    /**
+     * Reference: net.minecraft.client.renderer.blockentity.SignRenderer's static `signRotations`
+     * lookup table - same "precompute every possible orientation into an array" approach, adapted
+     * to a 12-entry (4 horizontal directions x {down, up, horizontal-face}) table instead of signs'.
+     */
     public static Quaternionf getNoteRotation(Direction faceDir, Direction horiDir) {
         // ordinal 0: Direction.DOWN, ordinal 1: Direction.UP, 2-5: horizontal directions.
         // subtract 2 from horizontal dir ordinal to shift index to 0-3, then switch between
@@ -228,6 +282,7 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         return signRotations[horiDir.ordinal() - 2 + 4 * Math.min(faceDir.ordinal(), 2)];
     }
 
+    /** Builds the {@link #signRotations} lookup table once at class-load time. See {@link #getNoteRotation}. */
     public static Quaternionf[] memoizeQuaternionRotations() {
         Quaternionf[] res = new Quaternionf[12];
         for (Direction dir : Direction.Plane.HORIZONTAL) {
@@ -238,7 +293,11 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         return res;
     }
 
-    // Calculate the actual note rotation. Handles horizontal and non-horizontal directions separately.
+    /**
+     * Reference: com.mojang.math.Axis rotation helpers as used throughout vanilla renderers (e.g.
+     * ItemFrameRenderer's per-direction rotation switch). Calculate the actual note rotation, handling
+     * horizontal and non-horizontal facings separately.
+     */
     public static Quaternionf calcQuat(Direction face, Direction hori) {
         return face.getAxis().isHorizontal()
                 ? switch (face) { /* horizontal rotation */
