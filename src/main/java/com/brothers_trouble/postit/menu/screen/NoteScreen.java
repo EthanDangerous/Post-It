@@ -3,7 +3,9 @@ package com.brothers_trouble.postit.menu.screen;
 import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.entity.PostItEntity;
 import com.brothers_trouble.postit.entity.entity_render.PostItRender;
+import com.brothers_trouble.postit.item.PostItItem;
 import com.brothers_trouble.postit.model.PostItModel;
+import com.brothers_trouble.postit.registration.ItemRegistry;
 import com.brothers_trouble.postit.registration.PacketRegistry;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -17,6 +19,9 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.block.entity.SignText;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -29,7 +34,12 @@ import java.util.stream.IntStream;
 
 @OnlyIn(Dist.CLIENT)
 public class NoteScreen extends Screen {
+	@Nullable
 	private final PostItEntity note;
+	@Nullable
+	private final InteractionHand hand;
+
+	private final int color;
 	private PostItModel model;
 	private SignText text;
 	private final String[] messages;
@@ -38,7 +48,7 @@ public class NoteScreen extends Screen {
 	@Nullable
 	private TextFieldHelper signField;
 
-    private final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/example_container.png");
+	private final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/example_container.png");
 
 	public NoteScreen(PostItEntity note, boolean isFiltered) {
 		this(note, isFiltered, Component.translatable("note.postit.edit"));
@@ -47,7 +57,22 @@ public class NoteScreen extends Screen {
 	public NoteScreen(PostItEntity note, boolean isFiltered, Component title) {
 		super(title);
 		this.note = note;
+		this.hand = null;
+		this.color = note.color();
 		this.text = note.text();
+		this.messages = IntStream.range(0, 4).mapToObj(i -> this.text.getMessage(i, isFiltered)).map(Component::getString).toArray(String[]::new);
+	}
+
+	public NoteScreen(ItemStack stack, InteractionHand hand, boolean isFiltered) {
+		this(stack, hand, isFiltered, Component.translatable("note.postit.edit"));
+	}
+
+	public NoteScreen(ItemStack stack, InteractionHand hand, boolean isFiltered, Component title) {
+		super(title);
+		this.note = null;
+		this.hand = hand;
+		this.color = DyedItemColor.getOrDefault(stack, PostItItem.DEFAULT_COLOR);
+		this.text = stack.getOrDefault(ItemRegistry.NOTE_TEXT_COMPONENT, new SignText());
 		this.messages = IntStream.range(0, 4).mapToObj(i -> this.text.getMessage(i, isFiltered)).map(Component::getString).toArray(String[]::new);
 	}
 
@@ -63,7 +88,7 @@ public class NoteScreen extends Screen {
 				this::setMessage,
 				TextFieldHelper.createClipboardGetter(this.minecraft),
 				TextFieldHelper.createClipboardSetter(this.minecraft),
-				string -> this.minecraft.font.width(string) <= this.note.maxTextLineWidth()
+				string -> this.minecraft.font.width(string) <= PostItEntity.MAX_TEXT_WIDTH
 		);
 	}
 
@@ -76,10 +101,14 @@ public class NoteScreen extends Screen {
 	}
 
 	private boolean isValid() {
-		return this.minecraft != null
-				&& this.minecraft.player != null
-				&& !this.note.isRemoved()
-				&& this.minecraft.player.canInteractWithEntity(this.note, 4.0);
+		if (this.minecraft == null || this.minecraft.player == null) return false;
+
+		if (this.note != null) {
+			return !this.note.isRemoved() && this.minecraft.player.canInteractWithEntity(this.note, 4.0);
+		}
+		// item mode: close the screen if they somehow stopped holding a note (dropped it, swapped
+		// hotbar slot, etc) while editing.
+		return this.hand != null && this.minecraft.player.getItemInHand(this.hand).is(ItemRegistry.POST_IT_NOTE);
 	}
 
 	@Override
@@ -136,7 +165,11 @@ public class NoteScreen extends Screen {
 	@Override
 	public void removed() {
 		assert this.minecraft != null;
-		PacketDistributor.sendToServer(PacketRegistry.UpdateNoteTextPacket.create(this.note, text));
+		if (this.note != null) {
+			PacketDistributor.sendToServer(PacketRegistry.UpdateNoteTextPacket.create(this.note, text));
+		} else if (this.hand != null) {
+			PacketDistributor.sendToServer(new PacketRegistry.UpdateHeldNoteTextPacket(this.hand, text));
+		}
 	}
 
 	@Override
@@ -162,7 +195,7 @@ public class NoteScreen extends Screen {
 		//guiGraphics.pose().scale(62.500004F, 62.500004F, -62.500004F);
 		var source = guiGraphics.bufferSource();
 		VertexConsumer modelCons = source.getBuffer(this.model.renderType(PostItRender.TEXTURE_LOCATION));
-		this.model.renderToBuffer(guiGraphics.pose(), modelCons, 0xf000f0, OverlayTexture.NO_OVERLAY, note.color());
+		this.model.renderToBuffer(guiGraphics.pose(), modelCons, 0xf000f0, OverlayTexture.NO_OVERLAY, this.color);
 		guiGraphics.flush();
 		guiGraphics.pose().popPose();
 		this.renderSignText(guiGraphics);
@@ -178,8 +211,8 @@ public class NoteScreen extends Screen {
 		boolean cursorBlink = this.frame / 6 % 2 == 0;
 		int cursorPos = this.signField.getCursorPos();
 		int selectionPos = this.signField.getSelectionPos();
-		int lineOffset = 4 * this.note.maxTextLineHeight() / 2;
-		int lineY = this.line * this.note.maxTextLineHeight() - lineOffset;
+		int lineOffset = 4 * PostItEntity.TEXT_LINE_HEIGHT / 2;
+		int lineY = this.line * PostItEntity.TEXT_LINE_HEIGHT - lineOffset;
 
 		for (int m = 0; m < this.messages.length; m++) {
 			String message = this.messages[m];
@@ -188,7 +221,7 @@ public class NoteScreen extends Screen {
 			if (this.font.isBidirectional()) message = this.font.bidirectionalShaping(message);
 
 			int xOffset = -this.font.width(message) / 2;
-			guiGraphics.drawString(this.font, message, xOffset, m * this.note.maxTextLineHeight() - lineOffset, textColor, false);
+			guiGraphics.drawString(this.font, message, xOffset, m * PostItEntity.TEXT_LINE_HEIGHT - lineOffset, textColor, false);
 			if (m == this.line && cursorPos >= 0 && cursorBlink) {
 				int selected = this.font.width(message.substring(0, Math.min(cursorPos, message.length())));
 				int cursorX = selected - this.font.width(message) / 2;
@@ -204,7 +237,7 @@ public class NoteScreen extends Screen {
 
 			int o = this.font.width(message.substring(0, Math.min(cursorPos, message.length())));
 			int p = o - this.font.width(message) / 2;
-			if (cursorBlink && cursorPos < message.length()) guiGraphics.fill(p, lineY - 1, p + 1, lineY + this.note.maxTextLineHeight(), 0xFF000000 | textColor);
+			if (cursorBlink && cursorPos < message.length()) guiGraphics.fill(p, lineY - 1, p + 1, lineY + PostItEntity.TEXT_LINE_HEIGHT, 0xFF000000 | textColor);
 
 			if (selectionPos == cursorPos) continue;
 			int minPos = Math.min(cursorPos, selectionPos);
@@ -213,14 +246,16 @@ public class NoteScreen extends Screen {
 			int off2 = this.font.width(message.substring(0, maxPos)) - this.font.width(message) / 2;
 			int minX = Math.min(off1, off2);
 			int maxX = Math.max(off1, off2);
-			guiGraphics.fill(RenderType.guiTextHighlight(), minX, lineY, maxX, lineY + this.note.maxTextLineHeight(), 0xff0000ff);
+			guiGraphics.fill(RenderType.guiTextHighlight(), minX, lineY, maxX, lineY + PostItEntity.TEXT_LINE_HEIGHT, 0xff0000ff);
 		}
 	}
 
 	private void setMessage(String message) {
 		this.messages[this.line] = message;
 		this.text = this.text.setMessage(this.line, Component.literal(message));
-		this.note.setText(this.text);
+		// live-updates the in-world entity's text as you type, purely as visual feedback while the
+		// screen is open; there's nothing to live-update when editing a held item, so skip it there.
+		if (this.note != null) this.note.setText(this.text);
 	}
 
 	private void onDone() {

@@ -38,13 +38,11 @@ import java.util.Objects;
 
 public class PostItEntity extends Entity implements GeoEntity {
     public static final float TEXT_SCALE       = 1F/6F;
-    public static final Vec3  TEXT_OFFSET      = new Vec3(0.0, 0.0F, 0.0F);
+    public static final Vec3  TEXT_OFFSET      = new Vec3(0.0, 0.0F, 0.0006F);
     public static final int   TEXT_LINE_HEIGHT = 10;
     public static final int   MAX_TEXT_WIDTH   = 90;
 
-    // how often (in ticks) we re-check whether the block behind the note is still there.
-    // same idea as vanilla HangingEntity's checkInterval polling, just a plain constant here.
-    private static final int SUPPORT_CHECK_INTERVAL = 20;
+    private static final int SUPPORT_CHECK_INTERVAL = 4; // in ticks. item frames check every tick, but i think 2-4 is more than enough
 
     protected static final EntityDataAccessor<Direction> FACE_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
     protected static final EntityDataAccessor<Direction> HORI_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
@@ -87,8 +85,6 @@ public class PostItEntity extends Entity implements GeoEntity {
     public void tick() {
         super.tick();
 
-        // Notes don't move, so this is only ever about noticing that the supporting block is gone.
-        // Polling every SUPPORT_CHECK_INTERVAL ticks instead of every tick keeps this cheap.
         if (!this.level().isClientSide
                 && !this.isRemoved()
                 && this.tickCount % SUPPORT_CHECK_INTERVAL == 0
@@ -97,12 +93,10 @@ public class PostItEntity extends Entity implements GeoEntity {
         }
     }
 
-    /** The block position the note is actually stuck to (one step "into" the block from the note itself). */
     protected BlockPos attachedBlockPos() {
         return BlockPos.containing(this.position()).relative(this.face().getOpposite());
     }
 
-    /** True while the block behind the note can still hold it up. */
     public boolean survives() {
         if (this.level().isOutsideBuildHeight(this.blockPosition())) return false;
 
@@ -110,8 +104,6 @@ public class PostItEntity extends Entity implements GeoEntity {
         return this.level().getBlockState(supportPos).isFaceSturdy(this.level(), supportPos, this.face());
     }
 
-    /** Pops the note off as a dropped item and removes the entity. Used both when the block behind it
-     *  disappears (see {@link #tick()}) and when a player punches it (see {@link #hurt}). */
     protected void dropAndDiscard() {
         this.spawnAtLocation(getPickupStack());
         this.playSound(SoundEvents.ITEM_FRAME_BREAK, 1.0F, 1.0F);
@@ -140,26 +132,15 @@ public class PostItEntity extends Entity implements GeoEntity {
     }
 
     protected final void recalculateBoundingBox(Direction faceDirection) {
-        AABB aABB = calculateBoundingBox(faceDirection, this.position());
-        Vec3 vec3 = aABB.getCenter();
-        this.setPosRaw(vec3.x, vec3.y, vec3.z);
-
-        //TODO: something is wrong here. after the first placement, the bounding box is no longer accurate
-        this.setBoundingBox(aABB);
+        this.setBoundingBox(calculateBoundingBox(faceDirection, this.position()));
     }
 
-    /**
-     * Static (and takes an explicit position) so PostItItem can predict a not-yet-spawned note's
-     * bounding box and check it for overlap with existing notes before ever creating the entity.
-     * Note: this is called during the constructor with position (0,0,0) since setPos() hasn't run
-     * yet - call {@link #refreshBoundingBox()} after positioning the entity to fix that up.
-     */
     public static AABB calculateBoundingBox(Direction direction, Vec3 pos) {
         float thickness = 0.035f;
         float length    = 0.25f;
 
         Vec3i normal = direction.getNormal();
-        Vec3  offset = new Vec3(normal.getX(), normal.getY(), normal.getZ()-0.5).scale(thickness / 2);
+        Vec3  offset = new Vec3(normal.getX(), normal.getY(), normal.getZ()).scale(thickness / 2);
 
         Direction.Axis axis = direction.getAxis();
         double x = axis == Direction.Axis.X ? thickness : length;
@@ -168,9 +149,6 @@ public class PostItEntity extends Entity implements GeoEntity {
         return AABB.ofSize(pos.add(offset), x, y, z);
     }
 
-    /** Recomputes the bounding box using the entity's *current* position. Call this after
-     *  {@code setPos(...)} on a freshly-constructed note, since the constructor computes the
-     *  box using position (0,0,0) before placement ever happens. */
     public void refreshBoundingBox() {
         recalculateBoundingBox(face());
     }
@@ -267,8 +245,6 @@ public class PostItEntity extends Entity implements GeoEntity {
         if (this.level().isClientSide) return true;
         if (this.isInvulnerableTo(source)) return false;
 
-        // Punching the note breaks it and gives it back, same shape as vanilla ItemFrame/
-        // Painting#hurt - creative-mode players just pop it off without a drop.
         this.markHurt();
 
         Entity attacker = source.getEntity();
