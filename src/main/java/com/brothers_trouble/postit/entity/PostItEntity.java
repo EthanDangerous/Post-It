@@ -37,14 +37,17 @@ import software.bernie.geckolib.util.*;
 import java.util.Objects;
 
 public class PostItEntity extends Entity implements GeoEntity {
-    public static final float TEXT_SCALE       = 1F/6F;
-    public static final Vec3  TEXT_OFFSET      = new Vec3(0.0, 0.0F, 0.0006F);
-    public static final int   TEXT_LINE_HEIGHT = 10;
-    public static final int   MAX_TEXT_WIDTH   = 90;
+    // these are just some of the funky text defaults that minecraft has (adjusted for my needs :3)
+    public static final float TEXT_SCALE = 1F/6F;
+    public static final Vec3 TEXT_OFFSET = new Vec3(0.0, 0.0F, 0.0006F); // this is the offset i use to stop z-fighting
+    public static final int TEXT_LINE_HEIGHT = 10;
+    public static final int MAX_TEXT_WIDTH = 90;
 
     private static final int SUPPORT_CHECK_INTERVAL = 4; // in ticks. item frames check every tick, but i think 2-4 is more than enough
 
+    // this is the face of the block that the note is attached to (particularly for the top and bottom faces)
     protected static final EntityDataAccessor<Direction> FACE_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
+    // this is the actual orientation of the note
     protected static final EntityDataAccessor<Direction> HORI_DIRECTION = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.DIRECTION);
 
     protected static final EntityDataAccessor<Integer> NOTE_COLOR = SynchedEntityData.defineId(PostItEntity.class, EntityDataSerializers.INT);

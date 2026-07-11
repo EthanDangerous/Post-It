@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -36,14 +37,17 @@ import static net.minecraft.client.renderer.blockentity.SignRenderer.getDarkColo
 @OnlyIn(Dist.CLIENT)
 public class PostItRender extends EntityRenderer<PostItEntity> {
 
+    // font is... the font of the text. because duh
     private final Font font;
 
     public static final int OUTLINE_RENDER_DISTANCE = Mth.square(16);
     public static final ResourceLocation TEXTURE_LOCATION = PostIt.locate("textures/entity/post_it_note.png");
 
+    // these have to do with the dimensions of the model
     private static final float HALF_WIDTH  = 2F / 16F;
     private static final float HALF_HEIGHT = 2F / 16F;
 
+    // this is how much of the UV is taken up by the texture
     private static final float UV_MAX = 4F / 16F;
 
     // sway animation
@@ -60,27 +64,37 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
 
     @Override
     public ResourceLocation getTextureLocation(PostItEntity entity) {
+        // just grabs the texture for the model
         return TEXTURE_LOCATION;
     }
 
     @Override
     public void render(PostItEntity entity, float entityYaw, float partialTick, PoseStack poseStack,
                        MultiBufferSource bufferSource, int packedLight) {
+        // the direction of the face of the block that the note is on (i believe)
         Direction faceDir = entity.face();
+        // the global direction that the note is facing (aka the direction that you can read the text clearly in)
         Direction horiDir = entity.hori();
 
         poseStack.pushPose();
 
+        // this rotates the note to the correct orientation
         poseStack.mulPose(getNoteRotation(faceDir, horiDir));
 
+        // this just connects the note to the block its on accordingly
         snapNoteToBlock(poseStack, faceDir, entity.position());
 
+        // this is all the math for the animation
+        // age is... the age of the entity (which should be in ticks)
         float age = entity.tickCount + partialTick + phase(entity);
+        // this is the calculated angle for the animation, which isnt really too crazy, math wise
         float swayAngle = SWAY_AMPLITUDE * 0.5F * (Mth.cos((float) (2 * Math.PI * age / SWAY_PERIOD_TICKS)) - 1F);
+        // the translation using half_height is just to make sure the note itself stays connected to the wall, and not slide downwards
         poseStack.translate(0, HALF_HEIGHT, 0);
         poseStack.mulPose(Axis.XP.rotationDegrees(swayAngle));
         poseStack.translate(0, -HALF_HEIGHT, 0);
 
+        // renderQuad is for the plane itself, and renderText, you would never believe this, renders the text
         renderQuad(entity, poseStack, bufferSource, packedLight);
         renderText(entity, entity.getOnPos(), entity.text(), poseStack, bufferSource, packedLight);
 
@@ -88,14 +102,18 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
     }
 
     private static float phase(PostItEntity entity) {
+        // this just offsets the animation for the notes, so they arent all swinging together
         return (entity.getId() * 37) % 1000;
     }
 
     public static void snapNoteToBlock(PoseStack poseStack, Direction faceDir, Vec3 pos) {
+        // pulls the coordinate for the facing axis, and skips if its a whole number (the return statement)
         var axis = faceDir.getAxis();
         var ord  = axis.choose(pos.x(), pos.y(), pos.z());
         if (ord == 0) return;
 
+        // this shouuuuld... snap it to the block its placed on...
+        // the math is super weird but its just gonna take its position and try and round it to the block its placed on
         var step  = faceDir.getAxisDirection().getStep();
         var rdm   = Mth.sign(ord) * step;
         var delta = (rdm - 1.) / 2. - rdm * Mth.frac(Math.abs(ord));
@@ -103,15 +121,23 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
     }
 
     private void renderQuad(PostItEntity entity, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        // this here just makes sure i can render on the front and back of the plane \/
         VertexConsumer vc = bufferSource.getBuffer(RenderType.entityCutoutNoCull(TEXTURE_LOCATION));
         Matrix4f pose = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal();
 
-        int entityColor = entity.color();
-        int r = (entityColor >> 16) & 0xFF;
-        int g = (entityColor >> 8) & 0xFF;
-        int b = entityColor & 0xFF;
+        // this is pretty old, but this is just the tinting for the entity. i pulled this from somewhere but i forget where
+        // maybe i got it from like, sheep code? its been forever
 
+        // altered for ARGB with the help of Ashley :3
+        int entityColor = entity.color();
+        int a = FastColor.ARGB32.alpha(entityColor);
+        int r = FastColor.ARGB32.red(entityColor);
+        int g = FastColor.ARGB32.green(entityColor);
+        int b = FastColor.ARGB32.blue(entityColor);
+
+        // to save space, a method was made so i could run all of this stuff in less space
+        // these are like, the corners of each plane (front and back)
         vertex(vc, pose, normal, -HALF_WIDTH,  HALF_HEIGHT, r, g, b, 0,      0,       0, 0,  1, packedLight);
         vertex(vc, pose, normal, -HALF_WIDTH, -HALF_HEIGHT, r, g, b, 0,      UV_MAX,  0, 0,  1, packedLight);
         vertex(vc, pose, normal,  HALF_WIDTH, -HALF_HEIGHT, r, g, b, UV_MAX, UV_MAX,  0, 0,  1, packedLight);
@@ -126,25 +152,32 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
     private void vertex(VertexConsumer vc, Matrix4f pose, Matrix3f normal,
                         float x, float y, int r, int g, int b, float u, float v,
                         float nx, float ny, float nz, int light) {
+        // this somehow helps with the lighting? i forget why i added this but i dont wanna remove it and mess things up
         Vector3f n = normal.transform(new Vector3f(nx, ny, nz));
+        // just the distance between the front and back face of the note
         float z = nz * (QUAD_SEPARATION / 2F);
         vc.addVertex(pose, x, y, z)
-                .setColor(r, g, b, 255)
-                .setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(light)
-                .setNormal(n.x(), n.y(), n.z());
+                .setColor(r, g, b, 255) // thiiiis is where the color is slapped in
+                .setUv(u, v) // this just pulls from the uv for the texture
+                .setOverlay(OverlayTexture.NO_OVERLAY) // i dont recall what this is for exactly, but i think its for tinting as well
+                .setLight(light) // just does some lighting stuffs
+                .setNormal(n.x(), n.y(), n.z()); // man, i dont even remember what a normal is atp its just black magic
     }
 
     void renderText(PostItEntity entity, BlockPos pos, SignText text, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
 
+        // for the record, this isnt to change the language of the text
+        // this moves the text around to fit it onto the note at the correct size and position
         translateSignText(poseStack, entity.textScale(), entity.textOffset());
 
+        // this does shadows for text, which is just taken from vanilla code
         int darkColor = getDarkColor(text);
+        // height and offset, which i think corresponds to space between lines and where the text is fixed onto the note
         int lineHeight = entity.maxTextLineHeight();
         int lineOffset = 4 * lineHeight / 2;
 
+        // this is just stolen from vanilla, i dont even wanna know how this works ngl
         FormattedCharSequence[] messages = text.getRenderMessages(
                 Minecraft.getInstance().isTextFilteringEnabled(),
                 component -> {
@@ -156,12 +189,14 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         int textColor = darkColor;
         int light = packedLight;
 
+        // this i think could let you make the text glow, but i have not tested that so im not sure
         if (text.hasGlowingText()) {
             textColor = text.getColor().getTextColor();
             renderOutline = isOutlineVisible(pos, textColor);
             light = 0xf000f0;
         }
 
+        // also from vanilla code, this is the actual text rendering.
         for (int m = 0; m < 4; ++m) {
             FormattedCharSequence message = messages[m];
             float xOffset = (float) -this.font.width(message) / 2;
@@ -177,23 +212,32 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         poseStack.popPose();
     }
 
+    // this makes sure the text thats rendered doesnt z-fight with the note its on
+    // or at least it is supposed to
     private static void translateSignText(PoseStack poseStack, float textScale, Vec3 offset) {
         poseStack.translate(offset.x, offset.y, offset.z);
+        // for some reason minecraft makes text appear quite big, and we dont want that here
         float scale = textScale / 64;
         poseStack.scale(scale, -scale, scale);
     }
 
     static boolean isOutlineVisible(BlockPos pos, int textColor) {
+        // something something black text needs outlines or else it would be invisible
         if (textColor == DyeColor.BLACK.getTextColor()) return true;
 
+        // this has to do with spyglass jank
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer localplayer = minecraft.player;
         if (localplayer != null && minecraft.options.getCameraType().isFirstPerson() && localplayer.isScoping())
             return true;
 
+        // outline is visible within a certain distance
         Entity cameraEntity = minecraft.getCameraEntity();
         return cameraEntity != null && cameraEntity.distanceToSqr(Vec3.atCenterOf(pos)) < (double) OUTLINE_RENDER_DISTANCE;
     }
+
+    // pizzer had pulled these methods from some vanilla code somewhere
+    // im just gonna be happy that it works and leave it alone
 
     public static final Quaternionf[] signRotations = memoizeQuaternionRotations();
 
