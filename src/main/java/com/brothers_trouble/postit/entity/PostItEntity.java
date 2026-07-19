@@ -102,14 +102,17 @@ public class PostItEntity extends Entity implements GeoEntity {
     }
 
     protected BlockPos attachedBlockPos() {
-        return BlockPos.containing(this.position()).relative(this.face().getOpposite());
+        return BlockPos.containing(this.position());
+    }
+
+    private boolean survivesOnBlockPos(BlockPos pos) {
+        return this.level().getBlockState(pos).getCollisionShape(this.level(), pos).clip(this.getPosition(1), this.getPosition(1).subtract(this.face().getStepX() * 0.1, this.face().getStepY() * 0.1, this.face().getStepZ() * 0.1), attachedBlockPos()) != null;
     }
 
     public boolean survives() {
         if (this.level().isOutsideBuildHeight(this.blockPosition()) || this.isInFluidType()) return false;
 
-        BlockPos supportPos = attachedBlockPos();
-        return this.level().getBlockState(supportPos).isFaceSturdy(this.level(), supportPos, this.face());
+        return survivesOnBlockPos(BlockPos.containing(this.position().subtract(this.face().getStepX() * 0.1, this.face().getStepY() * 0.1, this.face().getStepZ() * 0.1)));
     }
 
     protected void dropAndDiscard() {

@@ -81,9 +81,6 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         // this rotates the note to the correct orientation
         poseStack.mulPose(getNoteRotation(faceDir, horiDir));
 
-        // this just connects the note to the block its on accordingly
-        snapNoteToBlock(poseStack, faceDir, entity.position());
-
         // this is all the math for the animation
         // age is... the age of the entity (which should be in ticks)
         float age = entity.tickCount + partialTick + phase(entity);
@@ -104,20 +101,6 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
     private static float phase(PostItEntity entity) {
         // this just offsets the animation for the notes, so they arent all swinging together
         return (entity.getId() * 37) % 1000;
-    }
-
-    public static void snapNoteToBlock(PoseStack poseStack, Direction faceDir, Vec3 pos) {
-        // pulls the coordinate for the facing axis, and skips if its a whole number (the return statement)
-        var axis = faceDir.getAxis();
-        var ord  = axis.choose(pos.x(), pos.y(), pos.z());
-        if (ord == 0) return;
-
-        // this shouuuuld... snap it to the block its placed on...
-        // the math is super weird but its just gonna take its position and try and round it to the block its placed on
-        var step  = faceDir.getAxisDirection().getStep();
-        var rdm   = Mth.sign(ord) * step;
-        var delta = (rdm - 1.) / 2. - rdm * Mth.frac(Math.abs(ord));
-        poseStack.translate(0, 0, delta + .01);
     }
 
     private void renderQuad(PostItEntity entity, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
