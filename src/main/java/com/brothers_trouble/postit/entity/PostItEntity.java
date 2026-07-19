@@ -21,6 +21,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.DyedItemColor;
@@ -94,6 +95,10 @@ public class PostItEntity extends Entity implements GeoEntity {
                 && !this.survives()) {
             this.dropAndDiscard();
         }
+
+        if (!this.level().getEntities(this, this.getBoundingBox().inflate(0.5), e -> e instanceof FallingBlockEntity).isEmpty()) {
+            this.dropAndDiscard();
+        }
     }
 
     protected BlockPos attachedBlockPos() {
@@ -101,7 +106,7 @@ public class PostItEntity extends Entity implements GeoEntity {
     }
 
     public boolean survives() {
-        if (this.level().isOutsideBuildHeight(this.blockPosition())) return false;
+        if (this.level().isOutsideBuildHeight(this.blockPosition()) || this.isInFluidType()) return false;
 
         BlockPos supportPos = attachedBlockPos();
         return this.level().getBlockState(supportPos).isFaceSturdy(this.level(), supportPos, this.face());
