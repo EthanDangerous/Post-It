@@ -2,24 +2,16 @@ package com.brothers_trouble.postit.menu.screen;
 
 import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.entity.PostItEntity;
-import com.brothers_trouble.postit.entity.entity_render.PostItRender;
 import com.brothers_trouble.postit.item.PostItItem;
 import com.brothers_trouble.postit.menu.widget.CloseWidget;
-import com.brothers_trouble.postit.model.PostItModel;
 import com.brothers_trouble.postit.registration.ItemRegistry;
 import com.brothers_trouble.postit.registration.PacketRegistry;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -45,8 +37,7 @@ public class NoteScreen extends Screen {
 	private final InteractionHand hand;
 
 	private final int color;
-	private CloseWidget closeWidget;
-	private SignText text;
+    private SignText text;
 	private final String[] messages;
 	private int frame;
 	private int line;
@@ -83,8 +74,7 @@ public class NoteScreen extends Screen {
 
 	@Override
 	protected void init() {
-		this.closeWidget = new CloseWidget((this.width+144)/2, (this.height-176)/2, 16, 16);
-		this.addRenderableWidget(this.closeWidget);
+		this.addRenderableWidget(new CloseWidget((this.width + 144) / 2, (this.height - 176) / 2, 16, 16));
 		assert this.minecraft != null;
 		this.signField = new TextFieldHelper(
 				() -> this.messages[this.line],
