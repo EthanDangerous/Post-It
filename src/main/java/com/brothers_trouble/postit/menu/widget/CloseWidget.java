@@ -27,8 +27,6 @@ public class CloseWidget extends AbstractWidget {
 
     @Override
     public void onClick(double mouseX, double mouseY, int button){
-        if(Minecraft.getInstance() != null){
-            Minecraft.getInstance().setScreen(null);
-        }
+        Minecraft.getInstance().setScreen(null);
     }
 }
