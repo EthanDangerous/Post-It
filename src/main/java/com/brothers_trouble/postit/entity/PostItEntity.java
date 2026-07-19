@@ -22,7 +22,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.SignText;
@@ -195,6 +195,20 @@ public class PostItEntity extends Entity implements GeoEntity {
 
     @Override
     public @NotNull InteractionResult interact(Player player, @NotNull InteractionHand hand) {
+        ItemStack heldStack = player.getItemInHand(hand);
+
+        // check what the player is holding before we do the normal shift-click/open-screen stuff
+        // this is basically copying what vanilla signs do with DyeItem/GlowInkSacItem/InkSacItem
+        // (signs use a SignApplicator interface for this but that only works on SignBlockEntity, so cant reuse it directly here)
+        if (heldStack.getItem() instanceof DyeItem dyeItem) {
+            return applyDye(player, heldStack, dyeItem.getDyeColor());
+        } else if (heldStack.getItem() instanceof GlowInkSacItem) {
+            return applyGlow(player, heldStack, true);
+        } else if (heldStack.getItem() instanceof InkSacItem) {
+            return applyGlow(player, heldStack, false);
+        }
+
+        // pizzer's code
         if (player.isShiftKeyDown()) {
             PostIt.LOGGER.info("Interaction 1");
             if (player.level().isClientSide()) return InteractionResult.PASS;
@@ -204,6 +218,44 @@ public class PostItEntity extends Entity implements GeoEntity {
         } else {
             PostIt.LOGGER.info("Interaction 2");
             if (player.level().isClientSide()) openScreen();
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    // this recolors the note's text, same as dyeing a sign
+    private InteractionResult applyDye(Player player, ItemStack stack, DyeColor color) {
+        // only do this server-side, otherwise the client would be settings its own text
+        // and it wouldnt match what the server thinks it is
+        if (!this.level().isClientSide) {
+            SignText current = text();
+
+            // SignText is immutable (weird?) so setColor() doesnt change current, it hands back a whole new SignText
+            // this is only bother updating/consuming the dye if the color is actually gonna be different
+            // (same deal as vanilla signs, doesnt burn dye if you dye it the same color it already is)
+            if (current.getColor() != color) {
+                setText(current.setColor(color));
+                this.playSound(SoundEvents.DYE_USE, 1.0F, 1.0F);
+
+                // dont eat the dye if theyre in creative, dont wanna annoy people testing stuff
+                if (!player.getAbilities().instabuild) stack.shrink(1);
+            }
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    // this is for making the text glow (or un-glow with a normal ink sac), same deal as applyDye above
+    private InteractionResult applyGlow(Player player, ItemStack stack, boolean glowing) {
+        if (!this.level().isClientSide) {
+            SignText current = text();
+
+            // again, only actually do anything if the glow state is gonna change
+            // (so glow ink sac-ing an already-glowing note doesnt waste the item)
+            if (current.hasGlowingText() != glowing) {
+                setText(current.setHasGlowingText(glowing));
+                this.playSound(glowing ? SoundEvents.GLOW_INK_SAC_USE : SoundEvents.INK_SAC_USE, 1.0F, 1.0F);
+
+                if (!player.getAbilities().instabuild) stack.shrink(1);
+            }
         }
         return InteractionResult.SUCCESS;
     }
@@ -310,4 +362,8 @@ public class PostItEntity extends Entity implements GeoEntity {
         return event.setAndContinue(TEST_ANIM);
     }
 
+    @Override
+    public Vec3 getLightProbePosition(float partialTicks) { // this just fixes the lighting issue on the top of blocks by making the game think the entity is a bit further from the block for lighting
+        return this.getEyePosition(partialTicks).add((new Vec3(this.entityData.get(FACE_DIRECTION).step())).scale(0.1));
+    }
 }
