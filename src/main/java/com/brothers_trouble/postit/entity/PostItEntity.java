@@ -37,7 +37,7 @@ import software.bernie.geckolib.util.*;
 
 import java.util.Objects;
 
-public class PostItEntity extends Entity implements GeoEntity {
+public class PostItEntity extends Entity {
     // these are just some of the funky text defaults that minecraft has (adjusted for my needs :3)
     public static final float TEXT_SCALE = 1F/6F;
     public static final Vec3 TEXT_OFFSET = new Vec3(0.0, 0.0F, 0.0006F); // this is the offset i use to stop z-fighting
@@ -55,8 +55,6 @@ public class PostItEntity extends Entity implements GeoEntity {
     protected static final EntityDataAccessor<SignText> NOTE_TEXT = SynchedEntityData.defineId(PostItEntity.class, EntityRegistry.NOTE_TEXT_DATA_SERIALIZER);
 
     protected final ItemStack stack;
-
-    private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
     public PostItEntity(EntityType<? extends PostItEntity> entityType, Level level) {
         this(entityType, level, Direction.UP, Direction.NORTH, new ItemStack(ItemRegistry.POST_IT_NOTE));
@@ -352,22 +350,6 @@ public class PostItEntity extends Entity implements GeoEntity {
 
         tag.putByte("HorizontalDirection", (byte) hori().get2DDataValue());
         tag.putByte("FacingDirection",     (byte) face().get3DDataValue());
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.geoCache;
-    }
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "Main", 10, this::controller));
-    }
-
-    protected static final RawAnimation TEST_ANIM = RawAnimation.begin().thenLoop("animation.post_it.test");
-
-    protected <E extends PostItEntity> PlayState controller(final AnimationState<E> event) {
-        return event.setAndContinue(TEST_ANIM);
     }
 
     @Override

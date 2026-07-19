@@ -15,9 +15,7 @@ import software.bernie.geckolib.model.*;
 
 @EventBusSubscriber(modid = PostIt.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModelRegistry {
-    
-    public static final GeoModel<PostItEntity> POST_IT_NOTE_MODEL = new DefaultedEntityGeoModel<>(ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "post_it_note"));
-    
+
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(PostItModel.LAYER_LOCATION, PostItModel::createBodyLayer);
