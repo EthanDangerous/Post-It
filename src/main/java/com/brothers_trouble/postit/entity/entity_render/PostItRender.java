@@ -179,15 +179,27 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
             light = 0xf000f0;
         }
 
+        int longestWidth = 0;
+        int biggestNonEmptyLine = 0;
+        for (int i = 0; i < messages.length; i++) {
+            FormattedCharSequence message = messages[i];
+            if (this.font.width(message) > longestWidth) longestWidth = this.font.width(message);
+            if (message != FormattedCharSequence.EMPTY) biggestNonEmptyLine = i + 1;
+        }
+        float scale = Math.clamp((float) entity.maxTextLineWidth() / longestWidth, 0, 2);
+
+        poseStack.scale(scale, scale, 1f);
+        poseStack.translate(0, -this.font.lineHeight * 0.5f * biggestNonEmptyLine, 0);
+
         // also from vanilla code, this is the actual text rendering.
         for (int m = 0; m < 4; ++m) {
             FormattedCharSequence message = messages[m];
             float xOffset = (float) -this.font.width(message) / 2;
             if (renderOutline) {
-                this.font.drawInBatch8xOutline(message, xOffset, m * lineHeight - lineOffset,
+                this.font.drawInBatch8xOutline(message, xOffset, m * lineHeight,
                         textColor, darkColor, poseStack.last().pose(), buffer, light);
             } else {
-                this.font.drawInBatch(message, xOffset, m * lineHeight - lineOffset,
+                this.font.drawInBatch(message, xOffset, m * lineHeight,
                         textColor, false, poseStack.last().pose(), buffer, Font.DisplayMode.POLYGON_OFFSET, 0, light);
             }
         }
