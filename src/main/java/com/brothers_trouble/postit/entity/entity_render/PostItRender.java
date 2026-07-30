@@ -42,6 +42,7 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
 
     public static final int OUTLINE_RENDER_DISTANCE = Mth.square(16);
     public static final ResourceLocation TEXTURE_LOCATION = PostIt.locate("textures/entity/post_it_note.png");
+    public static final ResourceLocation CORRECTION_TEXTURE_LOCATION = PostIt.locate("textures/entity/post_it_note_correction.png");
 
     // these have to do with the dimensions of the model
     private static final float HALF_WIDTH  = 2F / 16F;
@@ -56,6 +57,7 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
 
     // this is the distance between the front and back planes
     private static final float QUAD_SEPARATION = 0.0006F;
+    private static final float CORRECTION_Z_OFFSET = QUAD_SEPARATION / 4F; // sits between the front face and the text
 
     public PostItRender(EntityRendererProvider.Context context) {
         super(context);
@@ -130,6 +132,14 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         vertex(vc, pose, normal,  HALF_WIDTH, -HALF_HEIGHT, r, g, b, 0,      UV_MAX,  0, 0, -1, packedLight);
         vertex(vc, pose, normal, -HALF_WIDTH, -HALF_HEIGHT, r, g, b, UV_MAX, UV_MAX,  0, 0, -1, packedLight);
         vertex(vc, pose, normal, -HALF_WIDTH,  HALF_HEIGHT, r, g, b, UV_MAX, 0,       0, 0, -1, packedLight);
+
+        // color correction plane
+        // trying 0 0 0 for the rgb values, but i may need to make that 255 255 255 later
+        VertexConsumer vcCorrection = bufferSource.getBuffer(RenderType.entityTranslucent(CORRECTION_TEXTURE_LOCATION));
+        vertex(vcCorrection, pose, normal, -HALF_WIDTH,  HALF_HEIGHT, 0, 0, 0, 0,      0,       0, 0, 1, packedLight, CORRECTION_Z_OFFSET);
+        vertex(vcCorrection, pose, normal, -HALF_WIDTH, -HALF_HEIGHT, 0, 0, 0, 0,      UV_MAX,  0, 0, 1, packedLight, CORRECTION_Z_OFFSET);
+        vertex(vcCorrection, pose, normal,  HALF_WIDTH, -HALF_HEIGHT, 0, 0, 0, UV_MAX, UV_MAX,  0, 0, 1, packedLight, CORRECTION_Z_OFFSET);
+        vertex(vcCorrection, pose, normal,  HALF_WIDTH,  HALF_HEIGHT, 0, 0, 0, UV_MAX, 0,       0, 0, 1, packedLight, CORRECTION_Z_OFFSET);
     }
 
     private void vertex(VertexConsumer vc, Matrix4f pose, Matrix3f normal,
@@ -145,6 +155,19 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
                 .setOverlay(OverlayTexture.NO_OVERLAY) // i dont recall what this is for exactly, but i think its for tinting as well
                 .setLight(light) // just does some lighting stuffs
                 .setNormal(n.x(), n.y(), n.z()); // man, i dont even remember what a normal is atp its just black magic
+    }
+
+    // this one is just for the correction layer
+    private void vertex(VertexConsumer vc, Matrix4f pose, Matrix3f normal,
+                        float x, float y, int r, int g, int b, float u, float v,
+                        float nx, float ny, float nz, int light, float zOverride) {
+        Vector3f n = normal.transform(new Vector3f(nx, ny, nz));
+        vc.addVertex(pose, x, y, zOverride)
+                .setColor(r, g, b, 255)
+                .setUv(u, v)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(light)
+                .setNormal(n.x(), n.y(), n.z());
     }
 
     void renderText(PostItEntity entity, BlockPos pos, SignText text, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
