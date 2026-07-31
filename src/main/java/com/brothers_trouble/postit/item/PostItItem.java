@@ -25,6 +25,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +36,7 @@ public class PostItItem extends Item{
     public PostItItem(Properties properties) {
         super(properties
                 .component(DataComponents.DYED_COLOR, new DyedItemColor(DEFAULT_COLOR, true))
-                        .component(ItemRegistry.NOTE_TEXT_COMPONENT, new SignText())
+                .component(ItemRegistry.NOTE_TEXT_COMPONENT, new SignText())
         );
     }
 
@@ -53,29 +54,36 @@ public class PostItItem extends Item{
             Direction side = context.getClickedFace();
             if (side.getAxis().isHorizontal()) facing = side.getOpposite(); // snap facing direction to side if horizontal
 
+            Vec3 spawnPos = vec3.add(
+                    context.getClickedFace().getStepX() * 0.01,
+                    context.getClickedFace().getStepY() * 0.01,
+                    context.getClickedFace().getStepZ() * 0.01);
+
+            AABB prospectiveBox = PostItEntity.calculateBoundingBox(side, spawnPos);
+            boolean overlapsExistingNote = !level.getEntities((net.minecraft.world.entity.Entity) null,
+                    prospectiveBox, e -> e instanceof PostItEntity).isEmpty();
+            if (overlapsExistingNote) return InteractionResult.FAIL;
+
             PostItEntity postItEntity = new PostItEntity(EntityRegistry.POST_IT_NOTE_ENTITY.get(), level, side, facing, stack);
-            postItEntity.setPos(vec3.add(context.getClickedFace().getStepX() * 0.01, context.getClickedFace().getStepY() * 0.01, context.getClickedFace().getStepZ() * 0.01));
+            postItEntity.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
+
+            postItEntity.refreshBoundingBox();
             level.addFreshEntity(postItEntity);
 
             stack.shrink(1);
             return InteractionResult.SUCCESS;
         }
-        return InteractionResult.FAIL;
+        return InteractionResult.PASS;
     }
 
-//    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-//        ItemStack itemstack = player.getItemInHand(hand);
-//
-//        if (!level.isClientSide) {
-//            if (!player.isShiftKeyDown()) {
-//                Minecraft.getInstance().setScreen(new NoteScreen(this, false));
-//
-////                return InteractionResult.SUCCESS;
-//            }
-//        }
-////            player.awardStat(Stats.ITEM_USED.get(this));
-////            player.gameEvent(GameEvent.ITEM_INTERACT_START);
-//
-//        return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
-//    }
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (player.isShiftKeyDown()) return InteractionResultHolder.pass(stack);
+
+        if (level.isClientSide) {
+            Minecraft.getInstance().setScreen(new NoteScreen(stack, hand, false));
+        }
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+    }
 }

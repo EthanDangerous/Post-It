@@ -17,7 +17,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
 public class PostItModel extends EntityModel<PostItEntity> {
-	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(
 			ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "post_it_note_model"), "main");
 	private final ModelPart model;
@@ -30,11 +29,12 @@ public class PostItModel extends EntityModel<PostItEntity> {
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partdefinition = meshdefinition.getRoot();
 
+		// i think this should be fixed now
 		PartDefinition model = partdefinition.addOrReplaceChild("post_it",
 				CubeListBuilder.create()
 						.texOffs(0, 0)
-						.addBox(-2.0F, 0.1F, -2.0F, 4.0F, 0.0F, 4.0F, new CubeDeformation(0.001F)),
-				PartPose.offset(0.0F, 0.1F, 0.0F));
+						.addBox(-2.0F, -2.0F, -0.0005F, 4.0F, 4.0F, 0.00001F, new CubeDeformation(0.001F)),
+				PartPose.offset(0.0F, 0.0F, 0.0F));
 
 
 		return LayerDefinition.create(meshdefinition, 16, 16);
@@ -47,6 +47,7 @@ public class PostItModel extends EntityModel<PostItEntity> {
 
 	@Override
 	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int i1, int i2) {
-		model.render(poseStack, vertexConsumer, 255, i1, i2);
+		// this should fix the lighting hopefully?
+		model.render(poseStack, vertexConsumer, i, i1, i2);
 	}
 }

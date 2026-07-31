@@ -1,0 +1,29 @@
+{
+  "parent": "postit:custom/obtain_note",
+  "criteria": {
+    "make_note_glow": {
+      "trigger": "minecraft:player_interacted_with_entity",
+      "conditions": {
+        "item": {
+          "items": "minecraft:glow_ink_sac"
+        },
+        "entity": {
+          "type": "postit:post_it_note"
+        }
+      }
+    }
+  },
+  "display": {
+    "description": "Make a post it note glow",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:glow_ink_sac"
+    },
+    "title": "Glow 2"
+  },
+  "requirements": [
+    [
+      "make_note_glow"
+    ]
+  ]
+}

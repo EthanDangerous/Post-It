@@ -1,0 +1,55 @@
+{
+  "display": {
+    "icon": {
+      "id": "postit:post_it_note"
+    },
+    "title": "Post It!",
+    "description": "An introduction to Post It!",
+    "background": "minecraft:textures/block/oak_planks.png",
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "obtained_paper": {
+      "trigger": "minecraft:recipe_crafted",
+      "conditions": {
+        "recipe_id": "minecraft:paper"
+      }
+    },
+    "obtained_shears": {
+      "trigger": "minecraft:recipe_crafted",
+      "conditions": {
+        "recipe_id": "minecraft:shears"
+      }
+    },
+    "has_paper_and_shears": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:shears"
+          },
+          {
+            "items": "minecraft:paper"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "obtained_paper",
+      "has_paper_and_shears"
+    ],
+    [
+      "obtained_shears",
+      "has_paper_and_shears"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "postit:bulk_notes"
+    ]
+  }
+}

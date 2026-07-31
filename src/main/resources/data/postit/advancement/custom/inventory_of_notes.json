@@ -1,0 +1,37 @@
+{
+  "parent": "postit:custom/obtain_note",
+  "criteria": {
+    "inventory_of_notes": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "slots": {
+          "occupied": 36,
+          "full": 36
+        },
+        "items": [
+          {
+            "items": [
+              "postit:post_it_note"
+            ],
+            "count": {
+              "min": 64
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "description": "Fill your inventory with stacks of post it notes",
+    "icon": {
+      "id": "minecraft:paper"
+    },
+    "title": "Forgetful",
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "inventory_of_notes"
+    ]
+  ]
+}
