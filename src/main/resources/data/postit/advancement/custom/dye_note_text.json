@@ -33,9 +33,9 @@
   "display": {
     "description": "Dye the text for a note",
     "icon": {
-      "id": "minecraft:yellow_dye"
+      "id": "minecraft:pink_dye"
     },
-    "title": "Dye"
+    "title": "Prettier in Pink"
   },
   "requirements": [
     [

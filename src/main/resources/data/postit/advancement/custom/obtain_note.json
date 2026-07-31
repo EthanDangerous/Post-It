@@ -3,7 +3,7 @@
     "icon": {
       "id": "minecraft:shears"
     },
-    "title": "Obtain your first note",
+    "title": "Taking Note",
     "description": "You can make notes by right clicking paper in your inventory with shears, or using the bulk recipe!",
     "frame": "task",
     "show_toast": false,
