@@ -136,10 +136,15 @@ public class PostItRender extends EntityRenderer<PostItEntity> {
         // color correction plane
         // trying 0 0 0 for the rgb values, but i may need to make that 255 255 255 later
         VertexConsumer vcCorrection = bufferSource.getBuffer(RenderType.entityTranslucent(CORRECTION_TEXTURE_LOCATION));
-        vertex(vcCorrection, pose, normal, -HALF_WIDTH,  HALF_HEIGHT, 0, 0, 0, 0,      0,       0, 0, 1, packedLight, CORRECTION_Z_OFFSET);
-        vertex(vcCorrection, pose, normal, -HALF_WIDTH, -HALF_HEIGHT, 0, 0, 0, 0,      UV_MAX,  0, 0, 1, packedLight, CORRECTION_Z_OFFSET);
-        vertex(vcCorrection, pose, normal,  HALF_WIDTH, -HALF_HEIGHT, 0, 0, 0, UV_MAX, UV_MAX,  0, 0, 1, packedLight, CORRECTION_Z_OFFSET);
-        vertex(vcCorrection, pose, normal,  HALF_WIDTH,  HALF_HEIGHT, 0, 0, 0, UV_MAX, 0,       0, 0, 1, packedLight, CORRECTION_Z_OFFSET);
+        vertex(vcCorrection, pose, normal, -HALF_WIDTH,  HALF_HEIGHT, 255, 255, 255, 0,      0,       0, 0, 1, packedLight, CORRECTION_Z_OFFSET);
+        vertex(vcCorrection, pose, normal, -HALF_WIDTH, -HALF_HEIGHT, 255, 255, 255, 0,      UV_MAX,  0, 0, 1, packedLight, CORRECTION_Z_OFFSET);
+        vertex(vcCorrection, pose, normal,  HALF_WIDTH, -HALF_HEIGHT, 255, 255, 255, UV_MAX, UV_MAX,  0, 0, 1, packedLight, CORRECTION_Z_OFFSET);
+        vertex(vcCorrection, pose, normal,  HALF_WIDTH,  HALF_HEIGHT, 255, 255, 255, UV_MAX, 0,       0, 0, 1, packedLight, CORRECTION_Z_OFFSET);
+
+        vertex(vcCorrection, pose, normal, HALF_WIDTH,  HALF_HEIGHT, 255, 255, 255, 0,      0,       0, 0, -1, packedLight, CORRECTION_Z_OFFSET);
+        vertex(vcCorrection, pose, normal, HALF_WIDTH, -HALF_HEIGHT, 255, 255, 255, 0,      UV_MAX,  0, 0, -1, packedLight, CORRECTION_Z_OFFSET);
+        vertex(vcCorrection, pose, normal, -HALF_WIDTH, -HALF_HEIGHT, 255, 255, 255, UV_MAX, UV_MAX,  0, 0, -1, packedLight, CORRECTION_Z_OFFSET);
+        vertex(vcCorrection, pose, normal, -HALF_WIDTH,  HALF_HEIGHT, 255, 255, 255, UV_MAX, 0,       0, 0, -1, packedLight, CORRECTION_Z_OFFSET);
     }
 
     private void vertex(VertexConsumer vc, Matrix4f pose, Matrix3f normal,
