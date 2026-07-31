@@ -29,6 +29,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.*;
 import software.bernie.geckolib.animatable.instance.*;
@@ -276,6 +278,7 @@ public class PostItEntity extends Entity {
         return stack;
     }
 
+    @OnlyIn(Dist.CLIENT)
     protected void openScreen() {
         Minecraft.getInstance().setScreen(new NoteScreen(this, false));
     }

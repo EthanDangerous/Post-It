@@ -27,6 +27,8 @@ import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.NotNull;
 
@@ -82,8 +84,13 @@ public class PostItItem extends Item{
         if (player.isShiftKeyDown()) return InteractionResultHolder.pass(stack);
 
         if (level.isClientSide) {
-            Minecraft.getInstance().setScreen(new NoteScreen(stack, hand, false));
+            openNoteScreen(stack, hand);
         }
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void openNoteScreen(ItemStack stack, InteractionHand hand) {
+        Minecraft.getInstance().setScreen(new NoteScreen(stack, hand, false));
     }
 }
