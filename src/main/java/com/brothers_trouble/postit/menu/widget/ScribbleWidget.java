@@ -2,7 +2,6 @@ package com.brothers_trouble.postit.menu.widget;
 
 import com.brothers_trouble.postit.PostIt;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -11,12 +10,13 @@ import net.minecraft.resources.ResourceLocation;
 
 import static net.minecraft.util.FastColor.ARGB32.*;
 
-public class CloseWidget extends AbstractWidget {
+public class ScribbleWidget extends AbstractWidget {
+
     public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/post_it_gui.png");
 
     private int color = 0xFFFFFFFF;
 
-    public CloseWidget(int x, int y, int width, int height) {
+    public ScribbleWidget(int x, int y, int width, int height) {
         super(x, y, width, height, Component.empty());
     }
 
@@ -37,9 +37,4 @@ public class CloseWidget extends AbstractWidget {
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
-
-    @Override
-    public void onClick(double mouseX, double mouseY, int button){
-        Minecraft.getInstance().setScreen(null);
-    }
 }

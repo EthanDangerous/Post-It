@@ -43,8 +43,10 @@ public class NoteScreen extends Screen {
 	private int line;
 	@Nullable
 	private TextFieldHelper signField;
+	private CloseWidget closeWidget;
 
-	private final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/example_container.png");
+
+	private final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/post_it_gui.png");
 
 	public NoteScreen(PostItEntity note, boolean isFiltered) {
 		this(note, isFiltered, Component.translatable("note.postit.edit"));
@@ -74,7 +76,7 @@ public class NoteScreen extends Screen {
 
 	@Override
 	protected void init() {
-		this.addRenderableWidget(new CloseWidget((this.width + 144) / 2, (this.height - 176) / 2, 16, 16));
+		this.closeWidget = this.addRenderableWidget(new CloseWidget((this.width + (164-68)) / 2, (this.height - (160-32)) / 2, 16, 16));
 		assert this.minecraft != null;
 		this.signField = new TextFieldHelper(
 				() -> this.messages[this.line],
@@ -125,8 +127,13 @@ public class NoteScreen extends Screen {
 		return true;
 	}
 
+	private int getTextColor() {
+		return this.text.hasGlowingText() ? this.text.getColor().getTextColor() : SignRenderer.getDarkColor(this.text);
+	}
+
 	@Override
 	public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+		this.closeWidget.setColor(this.getTextColor());
 		super.render(guiGraphics, mouseX, mouseY, partialTick);
 
 		guiGraphics.pose().pushPose();
@@ -146,7 +153,7 @@ public class NoteScreen extends Screen {
 		float b = blue(this.color);
 
 		RenderSystem.setShaderColor(r/255, g/255, b/255, 1.0F);
-		guiGraphics.blit(BACKGROUND_TEXTURE, (this.width - 160)/2, (this.height - 160)/2, 0, 0, 160, 160);
+		guiGraphics.blit(BACKGROUND_TEXTURE, (this.width - 164)/2, (this.height - 160)/2, 0, 0, 164, 160);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 
@@ -180,7 +187,7 @@ public class NoteScreen extends Screen {
 		guiGraphics.pose().translate(0.0F, 0.0F, 4.0F);
 		Vector3f vector3f = this.getSignTextScale();
 		guiGraphics.pose().scale(vector3f.x(), vector3f.y(), vector3f.z());
-		int textColor = this.text.hasGlowingText() ? this.text.getColor().getTextColor() : SignRenderer.getDarkColor(this.text);
+		int textColor = this.getTextColor();
 		boolean cursorBlink = this.frame / 6 % 2 == 0;
 		int cursorPos = this.signField.getCursorPos();
 		int selectionPos = this.signField.getSelectionPos();
