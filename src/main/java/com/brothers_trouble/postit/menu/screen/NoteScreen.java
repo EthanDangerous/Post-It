@@ -45,7 +45,6 @@ public class NoteScreen extends Screen {
 	private TextFieldHelper signField;
 	private CloseWidget closeWidget;
 
-
 	private final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/post_it_gui.png");
 
 	public NoteScreen(PostItEntity note, boolean isFiltered) {

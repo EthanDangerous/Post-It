@@ -12,6 +12,24 @@ import static net.minecraft.util.FastColor.ARGB32.*;
 
 public class ScribbleWidget extends AbstractWidget {
 
+    /*
+    scribbles come in 3 sizes:
+    69x40
+    42x40
+    42x32 (reserved for the top row)
+
+    alignment points
+    (starting at the top left position, based on the location of the gui, not the screen):
+    large:
+    (10, 118) (99, 118)
+    medium:
+    (10, 118) (126, 118)
+    small:
+    (11, 2)
+
+    making it data driven
+     */
+
     public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/post_it_gui.png");
 
     private int color = 0xFFFFFFFF;
