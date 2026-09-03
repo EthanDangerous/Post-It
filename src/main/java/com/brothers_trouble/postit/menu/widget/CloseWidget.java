@@ -31,7 +31,7 @@ public class CloseWidget extends AbstractWidget {
         float b = blue(this.color);
 
         RenderSystem.setShaderColor(r / 255, g / 255, b / 255, 1.0F);
-        guiGraphics.blit(TEXTURE, getX(), getY(), 176, 0, 16, 16);
+        guiGraphics.blit(TEXTURE, getX(), getY(), 176, 0, getWidth(), getHeight());
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 

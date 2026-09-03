@@ -3,17 +3,25 @@ package com.brothers_trouble.postit.menu.screen;
 import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.entity.PostItEntity;
 import com.brothers_trouble.postit.item.PostItItem;
+import com.brothers_trouble.postit.menu.Scribble;
 import com.brothers_trouble.postit.menu.widget.CloseWidget;
+import com.brothers_trouble.postit.menu.widget.ScribbleWidget;
 import com.brothers_trouble.postit.registration.ItemRegistry;
 import com.brothers_trouble.postit.registration.PacketRegistry;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.random.WeightedEntry;
+import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
@@ -25,6 +33,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static net.minecraft.util.FastColor.ARGB32.*;
@@ -44,8 +55,16 @@ public class NoteScreen extends Screen {
 	@Nullable
 	private TextFieldHelper signField;
 	private CloseWidget closeWidget;
+	private ScribbleWidget scribble1;
 
-	private final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/post_it_gui.png");
+	private final ResourceLocation scribbleTexture;
+	private static final ResourceLocation FALLBACK_SCRIBBLE_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "scribbles/dint");
+
+	private static final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/post_it_gui.png");
+
+	private static final RandomSource RANDOM = RandomSource.create();
+
+
 
 	public NoteScreen(PostItEntity note, boolean isFiltered) {
 		this(note, isFiltered, Component.translatable("note.postit.edit"));
@@ -53,6 +72,7 @@ public class NoteScreen extends Screen {
 
 	public NoteScreen(PostItEntity note, boolean isFiltered, Component title) {
 		super(title);
+		scribbleTexture = getScribble();
 		this.note = note;
 		this.hand = null;
 		this.color = note.color();
@@ -66,6 +86,7 @@ public class NoteScreen extends Screen {
 
 	public NoteScreen(ItemStack stack, InteractionHand hand, boolean isFiltered, Component title) {
 		super(title);
+		scribbleTexture = getScribble();
 		this.note = null;
 		this.hand = hand;
 		this.color = DyedItemColor.getOrDefault(stack, PostItItem.DEFAULT_COLOR);
@@ -73,10 +94,82 @@ public class NoteScreen extends Screen {
 		this.messages = IntStream.range(0, 4).mapToObj(i -> this.text.getMessage(i, isFiltered)).map(Component::getString).toArray(String[]::new);
 	}
 
+	private ResourceLocation getScribble(){
+		ArrayList<Scribble> scribbleList = getScribbleList();
+
+		while(scribble1 == null){
+			int index = (int)(Math.random() * scribbleList.size());
+			if(scribbleList.get(index).size() == Scribble.Size.SMALL){
+				return scribbleList.get(index).sprite();
+			}
+		}
+		return null;
+
+//		return WeightedRandom.getRandomItem(RANDOM,
+//						scribbles
+//								.holders()
+//								.map((scribbleReference) -> WeightedEntry.wrap(scribbleReference, scribbleReference.value().weight()))
+//								.toList()
+//				)
+//				.map(WeightedEntry.Wrapper::data)
+//				.map((holder)->holder.value().sprite())
+//				.orElse(FALLBACK_SCRIBBLE_TEXTURE);
+
+
+	}
+
+
+	private ArrayList<Scribble> getScribbleList() {
+		Registry<Scribble> registry = Minecraft.getInstance()
+				.level
+				.registryAccess()
+				.registryOrThrow(Scribble.REGISTRY_KEY);
+
+		ArrayList<Scribble> scribbleList = new ArrayList<>();
+		for (Scribble scribble : registry) {
+			scribbleList.add(scribble);
+		}
+		return scribbleList;
+	}
+
+//	private Iterator<Scribble> getValidScribble(){
+//		var scribbles = new java.util.ArrayList<>(Minecraft.getInstance()
+//                .level
+//                .registryAccess()
+//                .registryOrThrow(Scribble.REGISTRY_KEY)
+//                .stream()
+//                .toList());
+//		var totalWeight = WeightedRandom.getTotalWeight(scribbles);
+//		int small = 0;
+//		int medium = 0;
+//		int large = 0;
+//
+//		while (true) {
+//			Optional<Scribble> optionalScribble = WeightedRandom.getRandomItem(RANDOM, scribbles, totalWeight);
+//			if(optionalScribble.isEmpty()){
+//				break;
+//			}
+//			Scribble scribble = optionalScribble.get();
+//			scribbles.remove(scribble);
+//			boolean valid = switch (scribble.size()){
+//				case SMALL -> small < 1;
+//				case MEDIUM -> medium < 2;
+//				case LARGE -> large < 2;
+//			};
+//			if (!valid) {
+//				continue;
+//			}
+//
+//			/* use scribble*/
+//		}
+//	}
+
 	@Override
 	protected void init() {
-		this.closeWidget = this.addRenderableWidget(new CloseWidget((this.width + (164-68)) / 2, (this.height - (160-32)) / 2, 16, 16));
 		assert this.minecraft != null;
+
+		this.closeWidget = this.addRenderableWidget(new CloseWidget((this.width + (164-68)) / 2, (this.height - (160-32)) / 2, 16, 16));
+		this.scribble1 = this.addRenderableOnly(new ScribbleWidget((this.width - (164-20)) / 2, (this.height - (160-20)) / 2, 42, 32, scribbleTexture));
 		this.signField = new TextFieldHelper(
 				() -> this.messages[this.line],
 				this::setMessage,
@@ -133,6 +226,7 @@ public class NoteScreen extends Screen {
 	@Override
 	public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
 		this.closeWidget.setColor(this.getTextColor());
+		this.scribble1.setColor(this.getTextColor());
 		super.render(guiGraphics, mouseX, mouseY, partialTick);
 
 		guiGraphics.pose().pushPose();

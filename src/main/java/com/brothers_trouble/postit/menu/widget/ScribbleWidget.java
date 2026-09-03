@@ -30,12 +30,13 @@ public class ScribbleWidget extends AbstractWidget {
     making it data driven
      */
 
-    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/post_it_gui.png");
+    public final ResourceLocation scribble;
 
     private int color = 0xFFFFFFFF;
 
-    public ScribbleWidget(int x, int y, int width, int height) {
+    public ScribbleWidget(int x, int y, int width, int height, ResourceLocation scribble) {
         super(x, y, width, height, Component.empty());
+        this.scribble = scribble;
     }
 
     public void setColor(int color) {
@@ -49,7 +50,7 @@ public class ScribbleWidget extends AbstractWidget {
         float b = blue(this.color);
 
         RenderSystem.setShaderColor(r / 255, g / 255, b / 255, 1.0F);
-        guiGraphics.blit(TEXTURE, getX(), getY(), 176, 0, 16, 16);
+        guiGraphics.blitSprite(scribble, getX(), getY(), getWidth(), getHeight());
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 

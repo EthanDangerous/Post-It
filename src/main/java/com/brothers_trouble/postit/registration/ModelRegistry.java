@@ -13,7 +13,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import software.bernie.geckolib.model.*;
 
-@EventBusSubscriber(modid = PostIt.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = PostIt.MODID, value = Dist.CLIENT)
 public class ModelRegistry {
 
     @SubscribeEvent
