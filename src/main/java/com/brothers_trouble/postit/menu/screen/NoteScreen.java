@@ -15,12 +15,10 @@ import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -34,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -55,9 +53,22 @@ public class NoteScreen extends Screen {
 	@Nullable
 	private TextFieldHelper signField;
 	private CloseWidget closeWidget;
-	private ScribbleWidget scribble1;
 
-	private final ResourceLocation scribbleTexture;
+	private ArrayList<Scribble> scribbleList;
+
+
+	private ScribbleWidget scribbleWidget1;
+	private ScribbleWidget scribbleWidget2;
+	private ScribbleWidget scribbleWidget3;
+
+	private ResourceLocation scribbleTexture1;
+	private ResourceLocation scribbleTexture2;
+	private ResourceLocation scribbleTexture3;
+
+	private Scribble scribble1;
+	private Scribble scribble2;
+	private Scribble scribble3;
+
 	private static final ResourceLocation FALLBACK_SCRIBBLE_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "scribbles/dint");
 
 	private static final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(PostIt.MODID, "textures/gui/note/post_it_gui.png");
@@ -70,9 +81,16 @@ public class NoteScreen extends Screen {
 		this(note, isFiltered, Component.translatable("note.postit.edit"));
 	}
 
+	public NoteScreen(ItemStack stack, InteractionHand hand, boolean isFiltered) {
+		this(stack, hand, isFiltered, Component.translatable("note.postit.edit"));
+	}
+
 	public NoteScreen(PostItEntity note, boolean isFiltered, Component title) {
 		super(title);
-		scribbleTexture = getScribble();
+		scribbleList = getScribbleList();
+		scribble1 = getScribble(1);
+		scribble2 = getScribble(2);
+		scribble3 = getScribble(3);
 		this.note = note;
 		this.hand = null;
 		this.color = note.color();
@@ -80,13 +98,12 @@ public class NoteScreen extends Screen {
 		this.messages = IntStream.range(0, 4).mapToObj(i -> this.text.getMessage(i, isFiltered)).map(Component::getString).toArray(String[]::new);
 	}
 
-	public NoteScreen(ItemStack stack, InteractionHand hand, boolean isFiltered) {
-		this(stack, hand, isFiltered, Component.translatable("note.postit.edit"));
-	}
-
 	public NoteScreen(ItemStack stack, InteractionHand hand, boolean isFiltered, Component title) {
 		super(title);
-		scribbleTexture = getScribble();
+		scribbleList = getScribbleList();
+		scribble1 = getScribble(1);
+		scribble2 = getScribble(2);
+		scribble3 = getScribble(3);
 		this.note = null;
 		this.hand = hand;
 		this.color = DyedItemColor.getOrDefault(stack, PostItItem.DEFAULT_COLOR);
@@ -94,30 +111,31 @@ public class NoteScreen extends Screen {
 		this.messages = IntStream.range(0, 4).mapToObj(i -> this.text.getMessage(i, isFiltered)).map(Component::getString).toArray(String[]::new);
 	}
 
-	private ResourceLocation getScribble(){
-		ArrayList<Scribble> scribbleList = getScribbleList();
+	private Scribble getScribble(int num) {
+		List<Scribble> scribbles = switch (num) {
+			// this just splits the list into 2 groups, one being the small scribbles, and the other being medium and large scribbles
+			case 1 -> scribbleList.stream().filter(s -> s.size() == Scribble.Size.SMALL).toList();
+			case 2, 3 -> scribbleList.stream().filter(s -> s.size() != Scribble.Size.SMALL).toList();
+			default -> List.of();
+		};
 
-		while(scribble1 == null){
-			int index = (int)(Math.random() * scribbleList.size());
-			if(scribbleList.get(index).size() == Scribble.Size.SMALL){
-				return scribbleList.get(index).sprite();
-			}
+		// this is the thing that actually gets a random scribble while using weight
+		Optional<Scribble> picked = WeightedRandom.getRandomItem(RANDOM, scribbles);
+		if (picked.isEmpty()) {
+			return null; // no matching scribble left in the registry
 		}
-		return null;
 
-//		return WeightedRandom.getRandomItem(RANDOM,
-//						scribbles
-//								.holders()
-//								.map((scribbleReference) -> WeightedEntry.wrap(scribbleReference, scribbleReference.value().weight()))
-//								.toList()
-//				)
-//				.map(WeightedEntry.Wrapper::data)
-//				.map((holder)->holder.value().sprite())
-//				.orElse(FALLBACK_SCRIBBLE_TEXTURE);
+		Scribble finalScribble = picked.get();
+		scribbleList.remove(finalScribble);
 
+		switch (num) {
+			case 1 -> scribbleTexture1 = finalScribble.sprite();
+			case 2 -> scribbleTexture2 = finalScribble.sprite();
+			case 3 -> scribbleTexture3 = finalScribble.sprite();
+		}
 
+		return finalScribble;
 	}
-
 
 	private ArrayList<Scribble> getScribbleList() {
 		Registry<Scribble> registry = Minecraft.getInstance()
@@ -169,7 +187,21 @@ public class NoteScreen extends Screen {
 		assert this.minecraft != null;
 
 		this.closeWidget = this.addRenderableWidget(new CloseWidget((this.width + (164-68)) / 2, (this.height - (160-32)) / 2, 16, 16));
-		this.scribble1 = this.addRenderableOnly(new ScribbleWidget((this.width - (164-20)) / 2, (this.height - (160-20)) / 2, 42, 32, scribbleTexture));
+
+		this.scribbleWidget1 = this.addRenderableOnly(new ScribbleWidget((this.width - (164-10)) / 2, (this.height - (160-6)) / 2, 42, 32, scribbleTexture1));
+
+		if(scribble2.size() == Scribble.Size.MEDIUM){
+			this.scribbleWidget2 = this.addRenderableOnly(new ScribbleWidget((this.width - (164-8)) / 2, (this.height - (160-238)) / 2, 42, 40, scribbleTexture2));
+		}else{
+			this.scribbleWidget2 = this.addRenderableOnly(new ScribbleWidget((this.width - (164-8)) / 2, (this.height - (160-238)) / 2, 69, 40, scribbleTexture2));
+		}
+
+		if(scribble3.size() == Scribble.Size.MEDIUM){
+			this.scribbleWidget3 = this.addRenderableOnly(new ScribbleWidget((this.width - (164-240)) / 2, (this.height - (160-238)) / 2, 42, 40, scribbleTexture3));
+		}else{
+			this.scribbleWidget3 = this.addRenderableOnly(new ScribbleWidget((this.width - (164-186)) / 2, (this.height - (160-238)) / 2, 69, 40, scribbleTexture3));
+		}
+
 		this.signField = new TextFieldHelper(
 				() -> this.messages[this.line],
 				this::setMessage,
@@ -226,7 +258,9 @@ public class NoteScreen extends Screen {
 	@Override
 	public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
 		this.closeWidget.setColor(this.getTextColor());
-		this.scribble1.setColor(this.getTextColor());
+		this.scribbleWidget1.setColor(this.getTextColor());
+		this.scribbleWidget2.setColor(this.getTextColor());
+		this.scribbleWidget3.setColor(this.getTextColor());
 		super.render(guiGraphics, mouseX, mouseY, partialTick);
 
 		guiGraphics.pose().pushPose();
