@@ -1,5 +1,11 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "offroad"
+    }
+  ],
   "size": "large",
   "sprite": "postit:scribbles/offroad",
-  "weight": 1
+  "weight": 100
 }

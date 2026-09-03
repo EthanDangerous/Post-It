@@ -1,5 +1,11 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "malum"
+    }
+  ],
   "size": "small",
   "sprite": "postit:scribbles/malum",
-  "weight": 1
+  "weight": 100
 }

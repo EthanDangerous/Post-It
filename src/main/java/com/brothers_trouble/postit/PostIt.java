@@ -70,18 +70,7 @@ public class PostIt
         return ResourceLocation.fromNamespaceAndPath(MODID, name);
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event)
-    {
-        // Some common setup code
-        LOGGER.info("HELLO FROM COMMON SETUP");
-
-        if (Config.logDirtBlock)
-            LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
-
-        LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
-
-        Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
-    }
+    private void commonSetup(final FMLCommonSetupEvent event) {}
 
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event)
@@ -92,11 +81,7 @@ public class PostIt
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event)
-    {
-        // Do something when the server starts
-        LOGGER.info("HELLO from server starting");
-    }
+    public void onServerStarting(ServerStartingEvent event) {}
 
     private void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(
@@ -115,60 +100,10 @@ public class PostIt
         public static void onRegisterItemColorHandlers(RegisterColorHandlersEvent.Item event){
             event.register((stack, tintIndex) -> {
                 return DyedItemColor.getOrDefault(stack, PostItItem.DEFAULT_COLOR);
-//                if(tintInt == 0){
-////                    return Color.HSBtoRGB(0.5F, 0.5F, 1F);
-//                    return Color.GREEN.getRGB();
-////                    return new Color(tintInt, false);
-////                    return tintInt;
-//                }if(tintInt == 15){
-////                    return Color.HSBtoRGB(0.5F, 0.5F, 1F);
-//                    return Color.RED.getRGB();
-////                    return 15;
-//                } else{
-//                    return -1;
-//                }
             }, ItemRegistry.POST_IT_NOTE.get());
         }
-//                DyedItemColor tintInt = stack.getOrDefault(DataComponents.DYED_COLOR, null);
-//                int tintInt = PostItItem.getDyeColor(stack);
 
         @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event)
-        {
-            // Some client setup code
-            LOGGER.info("HELLO FROM CLIENT SETUP");
-            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
-        }
-
-//        @SubscribeEvent
-//        public static void registerItemColors(RegisterColorHandlersEvent.Item event){
-//            event.register(
-//                    (stack, tintIndex) -> {
-//                        boolean enabled = Optional.ofNullable(stack.get(ModDataComponents.ITEM_ENABLED)).orElse(false);
-//                        if(enabled){
-//                            if(tintIndex == 1){
-//                                return 0xFFFFFFFF;
-//                            } else if(tintIndex == 2){
-//                                double SCALAR = 1.5f;
-//                                double hue = ((440f * (1.0d/SCALAR)) + (System.currentTimeMillis() % (360 * (1.0d/SCALAR))));
-//                                return Mth.hsvToRgb((float) (( hue / 360.0f) * (0.4f * SCALAR)), 0.55F, 1.0F) | 0xFF000000;
-//                            }
-//                        } else {
-//                            if(tintIndex == 1){
-//                                return 0x00000000;
-//                            } else if(tintIndex == 2){
-//                                return 0x00000000;
-//                            }
-//                        }
-//                        return -1;
-//                    }, ModItems.ELECTRIC_SWORD.get());
-//            event.register((stack, idx) -> {
-//                if(stack.getItem() instanceof EnergyStoringItem energyStoringItem){
-//                    return 0xFF000000 | Mth.hsvToRgb(0.0f,
-//                            Math.max(0.3f, ((float)energyStoringItem.getEnergyStored(stack) / energyStoringItem.getMaxEnergyStored(stack))), 1.0f);
-//                }
-//                return -1;
-//            }, ModItems.HUGE_BATTERY.get());
-//        }
+        public static void onClientSetup(FMLClientSetupEvent event) {}
     }
 }

@@ -26,8 +26,6 @@ public class ScribbleWidget extends AbstractWidget {
     (10, 118) (126, 118)
     small:
     (11, 2)
-
-    making it data driven
      */
 
     public final ResourceLocation scribble;

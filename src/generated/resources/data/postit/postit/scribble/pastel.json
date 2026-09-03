@@ -1,5 +1,11 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "pastel"
+    }
+  ],
   "size": "medium",
   "sprite": "postit:scribbles/pastel",
-  "weight": 1
+  "weight": 100
 }

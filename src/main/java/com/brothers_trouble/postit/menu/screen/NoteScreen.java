@@ -150,38 +150,6 @@ public class NoteScreen extends Screen {
 		return scribbleList;
 	}
 
-//	private Iterator<Scribble> getValidScribble(){
-//		var scribbles = new java.util.ArrayList<>(Minecraft.getInstance()
-//                .level
-//                .registryAccess()
-//                .registryOrThrow(Scribble.REGISTRY_KEY)
-//                .stream()
-//                .toList());
-//		var totalWeight = WeightedRandom.getTotalWeight(scribbles);
-//		int small = 0;
-//		int medium = 0;
-//		int large = 0;
-//
-//		while (true) {
-//			Optional<Scribble> optionalScribble = WeightedRandom.getRandomItem(RANDOM, scribbles, totalWeight);
-//			if(optionalScribble.isEmpty()){
-//				break;
-//			}
-//			Scribble scribble = optionalScribble.get();
-//			scribbles.remove(scribble);
-//			boolean valid = switch (scribble.size()){
-//				case SMALL -> small < 1;
-//				case MEDIUM -> medium < 2;
-//				case LARGE -> large < 2;
-//			};
-//			if (!valid) {
-//				continue;
-//			}
-//
-//			/* use scribble*/
-//		}
-//	}
-
 	@Override
 	protected void init() {
 		assert this.minecraft != null;
@@ -225,8 +193,6 @@ public class NoteScreen extends Screen {
 		if (this.note != null) {
 			return !this.note.isRemoved() && this.minecraft.player.canInteractWithEntity(this.note, 4.0);
 		}
-		// item mode: close the screen if they somehow stopped holding a note (dropped it, swapped
-		// hotbar slot, etc) while editing.
 		return this.hand != null && this.minecraft.player.getItemInHand(this.hand).is(ItemRegistry.POST_IT_NOTE);
 	}
 
@@ -360,8 +326,6 @@ public class NoteScreen extends Screen {
 	private void setMessage(String message) {
 		this.messages[this.line] = message;
 		this.text = this.text.setMessage(this.line, Component.literal(message));
-		// live-updates the in-world entity's text as you type, purely as visual feedback while the
-		// screen is open; there's nothing to live-update when editing a held item, so skip it there.
 		if (this.note != null) this.note.setText(this.text);
 	}
 
