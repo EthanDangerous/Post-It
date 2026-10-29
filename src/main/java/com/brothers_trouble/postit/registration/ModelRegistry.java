@@ -12,18 +12,31 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import software.bernie.geckolib.model.*;
+import com.brothers_trouble.postit.entity.entity_render.PushPinRender;
 
 @EventBusSubscriber(modid = PostIt.MODID, value = Dist.CLIENT)
 public class ModelRegistry {
 
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(PostItModel.LAYER_LOCATION, PostItModel::createBodyLayer);
+        event.registerLayerDefinition(
+                PostItModel.LAYER_LOCATION, PostItModel::createBodyLayer
+        );
+
+        event.registerLayerDefinition(
+                PushPinRender.LAYER, PushPinRender::createBodyLayer
+        );
     }
 
     @SubscribeEvent
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(EntityRegistry.POST_IT_NOTE_ENTITY.get(), PostItRender::new);
+        event.registerEntityRenderer(
+                EntityRegistry.POST_IT_NOTE_ENTITY.get(), PostItRender::new
+        );
+
+        event.registerEntityRenderer(
+                EntityRegistry.PUSH_PIN_ENTITY.get(), PushPinRender::new
+        );
     }
 
     @SubscribeEvent

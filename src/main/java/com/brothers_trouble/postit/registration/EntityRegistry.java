@@ -2,6 +2,7 @@ package com.brothers_trouble.postit.registration;
 
 import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.entity.PostItEntity;
+import com.brothers_trouble.postit.entity.PushPinEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -28,6 +29,13 @@ public class EntityRegistry {
                             .sized(0.25F, 0.035F)
                             .updateInterval(Integer.MAX_VALUE)  // since post-its don't move, we don't need to update data from server to client
                             .build("post_it_note"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<PushPinEntity>> PUSH_PIN_ENTITY =
+            ENTITY_TYPES.register("push_pin",
+                    () -> EntityType.Builder.<PushPinEntity>of(PushPinEntity::new, MobCategory.MISC)
+                            .sized(0.0625F, 0.0625F)
+                            .updateInterval(Integer.MAX_VALUE)
+                            .build("push_pin"));
 
     public static final EntityDataSerializer<SignText> NOTE_TEXT_DATA_SERIALIZER =  new EntityDataSerializer<>() {
         @Override
