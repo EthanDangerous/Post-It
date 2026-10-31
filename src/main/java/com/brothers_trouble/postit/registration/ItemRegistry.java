@@ -2,6 +2,7 @@ package com.brothers_trouble.postit.registration;
 
 import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.item.PostItItem;
+import com.brothers_trouble.postit.item.PageItem;
 import com.brothers_trouble.postit.item.PushPinItem;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -20,11 +21,17 @@ public class ItemRegistry {
     public static final DeferredHolder<Item, Item> POST_IT_NOTE = ITEMS.register("post_it_note",
             () -> new PostItItem(new Item.Properties()));
 
+    public static final DeferredHolder<Item, Item> PAGE = ITEMS.register("page",
+            () -> new PageItem(new Item.Properties()));
+
     public static final DeferredHolder<Item, Item> PUSH_PIN = ITEMS.register("push_pin",
             () -> new PushPinItem(new Item.Properties()));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<SignText>> NOTE_TEXT_COMPONENT = COMPONENTS.register("note_text",
             () -> DataComponentType.<SignText>builder().persistent(SignText.DIRECT_CODEC).networkSynchronized(PacketRegistry.NOTE_TEXT_STREAM_CODEC).build());
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SignText>> PAGE_TEXT_COMPONENT = COMPONENTS.register("page_text",
+            () -> DataComponentType.<SignText>builder().persistent(SignText.DIRECT_CODEC).networkSynchronized(PacketRegistry.PAGE_TEXT_STREAM_CODEC).build());
 
     public static void register(IEventBus eventBus){
         CommonHooks.markComponentClassAsValid(SignText.class);

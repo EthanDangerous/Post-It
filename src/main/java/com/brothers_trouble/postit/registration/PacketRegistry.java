@@ -22,6 +22,7 @@ import java.util.UUID;
 
 public class PacketRegistry {
 	public static final StreamCodec<ByteBuf, SignText> NOTE_TEXT_STREAM_CODEC = ByteBufCodecs.fromCodec(SignText.DIRECT_CODEC);
+	public static final StreamCodec<ByteBuf, SignText> PAGE_TEXT_STREAM_CODEC = ByteBufCodecs.fromCodec(SignText.DIRECT_CODEC);
 
 	private static final StreamCodec<ByteBuf, InteractionHand> HAND_STREAM_CODEC = ByteBufCodecs.BOOL.map(
 			offHand -> offHand ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND,

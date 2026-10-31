@@ -9,6 +9,7 @@ public class RenderRegistry {
     public static void registerRenderers(final FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             EntityRenderers.register(EntityRegistry.POST_IT_NOTE_ENTITY.get(), PostItRender::new);
+            EntityRenderers.register(EntityRegistry.PAGE_ENTITY.get(), PageRender::new);
             EntityRenderers.register(EntityRegistry.PUSH_PIN_ENTITY.get(), PushPinRender::new);
         });
     }

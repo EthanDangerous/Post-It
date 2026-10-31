@@ -4,6 +4,7 @@ import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.entity.*;
 import com.brothers_trouble.postit.entity.entity_render.*;
 import com.brothers_trouble.postit.model.PostItModel;
+import com.brothers_trouble.postit.model.PageModel;
 import net.minecraft.resources.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -24,6 +25,10 @@ public class ModelRegistry {
         );
 
         event.registerLayerDefinition(
+                PageModel.LAYER_LOCATION, PageModel::createBodyLayer
+        );
+
+        event.registerLayerDefinition(
                 PushPinRender.LAYER, PushPinRender::createBodyLayer
         );
     }
@@ -32,6 +37,10 @@ public class ModelRegistry {
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(
                 EntityRegistry.POST_IT_NOTE_ENTITY.get(), PostItRender::new
+        );
+
+        event.registerEntityRenderer(
+                EntityRegistry.PAGE_ENTITY.get(), PageRender::new
         );
 
         event.registerEntityRenderer(

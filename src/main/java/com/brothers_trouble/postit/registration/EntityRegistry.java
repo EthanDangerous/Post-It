@@ -2,6 +2,7 @@ package com.brothers_trouble.postit.registration;
 
 import com.brothers_trouble.postit.PostIt;
 import com.brothers_trouble.postit.entity.PostItEntity;
+import com.brothers_trouble.postit.entity.PageEntity;
 import com.brothers_trouble.postit.entity.PushPinEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -30,6 +31,14 @@ public class EntityRegistry {
                             .updateInterval(Integer.MAX_VALUE)  // since post-its don't move, we don't need to update data from server to client
                             .build("post_it_note"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<PageEntity>> PAGE_ENTITY =
+            ENTITY_TYPES.register("page",
+                    () -> EntityType.Builder.<PageEntity>of(PageEntity::new, MobCategory.MISC)
+                            .sized(0.5F, 0.035F)
+                            .updateInterval(Integer.MAX_VALUE)
+                            .build("page"));
+
+
     public static final DeferredHolder<EntityType<?>, EntityType<PushPinEntity>> PUSH_PIN_ENTITY =
             ENTITY_TYPES.register("push_pin",
                     () -> EntityType.Builder.<PushPinEntity>of(PushPinEntity::new, MobCategory.MISC)
@@ -48,8 +57,22 @@ public class EntityRegistry {
         }
     };
 
+    public static final EntityDataSerializer<SignText> PAGE_TEXT_DATA_SERIALIZER =  new EntityDataSerializer<>() {
+        @Override
+        public @NotNull StreamCodec<? super RegistryFriendlyByteBuf, SignText> codec() {
+            return PacketRegistry.PAGE_TEXT_STREAM_CODEC;
+        }
+
+        public @NotNull SignText copy(@NotNull SignText text) {
+            return new SignText(text.getMessages(false), text.getMessages(true), text.getColor(), text.hasGlowingText());
+        }
+    };
+
     public static final DeferredHolder<EntityDataSerializer<?>, EntityDataSerializer<SignText>> NOTE_TEXT_DATA =
             DATA_SERIALIZERS.register("note_text", () -> NOTE_TEXT_DATA_SERIALIZER);
+
+    public static final DeferredHolder<EntityDataSerializer<?>, EntityDataSerializer<SignText>> PAGE_TEXT_DATA =
+            DATA_SERIALIZERS.register("page_text", () -> PAGE_TEXT_DATA_SERIALIZER);
 
     public static void register(IEventBus eventBus) {
         DATA_SERIALIZERS.register(eventBus);
